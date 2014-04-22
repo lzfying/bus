@@ -108,6 +108,8 @@ Ext.onReady(function() {
 										}, {
 											name : 'week'
 										}, {
+											name : 'timestep'
+										}, {
 											name : 'weather'
 										}, {
 											name : 'downreal'
