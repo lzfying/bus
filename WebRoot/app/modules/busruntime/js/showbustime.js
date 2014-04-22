@@ -49,15 +49,15 @@ Ext.onReady(function() {
 						width : 150,
 						dataIndex : 'downav'
 					}, {
-						header : '下行周转时间预测波动值',
+						header : '下行预测波动值',
 						width : 150,
 						dataIndex : 'downpuls'
 					}, {
-						header : '上行周转时间预测均值',
+						header : '上行预测均值',
 						width : 150,
 						dataIndex : 'upav'
 					}, {
-						header : '上行周转时间预测波动值',
+						header : '上行预测波动值',
 						width : 150,
 						dataIndex : 'uppuls'
 					}]);
