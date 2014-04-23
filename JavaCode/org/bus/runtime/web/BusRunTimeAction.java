@@ -26,7 +26,7 @@ import org.g4studio.core.web.CommonActionForm;
 public class BusRunTimeAction extends BizAction {
 
 	/**
-	 * 表格演示一页面初始化
+	 * 周转时间预测初始化
 	 * 
 	 * @param mapping
 	 * @param form
@@ -39,6 +39,22 @@ public class BusRunTimeAction extends BizAction {
 			HttpServletResponse response) throws Exception {
 		
 		return mapping.findForward("calculateTimeInitView");
+	}
+	
+	/**
+	 * 分线路单车实际周转时间对比
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward compareTimeInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		
+		return mapping.findForward("compareTimeInitView");
 	}
 	
 	
@@ -62,6 +78,7 @@ public class BusRunTimeAction extends BizAction {
 		
 		
 		List list = g4Reader.queryForList("Bus.countStddev", dto);
+		//Integer countInteger = (Integer) g4Reader.queryForObject("Bus.countStddev", dto);
 		String jsonString = JsonHelper.encodeObject2Json(list);
 		
 		//String jsonString = JsonHelper.encodeList2PageJson(list, countInteger, G4Constants.FORMAT_Date);
@@ -69,6 +86,27 @@ public class BusRunTimeAction extends BizAction {
 		return mapping.findForward(null);
 	}
 	
+	
+	/**
+	 * 
+	 * 分线路单车实际周转时间 获取分页数据
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward queryCompareBustime(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		CommonActionForm aForm = (CommonActionForm) form;
+		Dto dto = aForm.getParamAsDto(request);
+		List list = g4Reader.queryForPage("Bus.compareBustime", dto);
+		Integer countInteger = (Integer) g4Reader.queryForObject("Bus.countcompareBustime", dto);
+		String jsonString = JsonHelper.encodeList2PageJson(list, countInteger, G4Constants.FORMAT_Date);
+		super.write(jsonString, response);
+		return mapping.findForward(null);
+	}
 	
 	
 	/**

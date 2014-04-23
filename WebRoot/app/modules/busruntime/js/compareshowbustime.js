@@ -40,26 +40,38 @@ Ext.onReady(function() {
 							
 							
 						}
+					},  {
+						header : '时段',
+						width : 80,
+						dataIndex : 'timearea'
 					}, {
 						header : '天气',
 						width : 80,
 						dataIndex : 'weather'
 					}, {
-						header : '下行周转预测均值',
+						header : '班次开始时间',
 						width : 150,
-						dataIndex : 'downav'
+						dataIndex : 'starttime'
 					}, {
-						header : '下行预测波动值',
+						header : '上下行',
 						width : 150,
-						dataIndex : 'downpuls'
+						dataIndex : 'state'
 					}, {
-						header : '上行预测均值',
+						header : '本车周转时间',
 						width : 150,
-						dataIndex : 'upav'
+						dataIndex : 'triptime'
 					}, {
-						header : '上行预测波动值',
+						header : '预测值',
 						width : 150,
-						dataIndex : 'uppuls'
+						dataIndex : 'pretime'
+					}, {
+						header : '差值',
+						width : 150,
+						dataIndex : 'plustime'
+					}, {
+						header : '线路均值',
+						width : 150,
+						dataIndex : 'routeavtime'
 					}]);
 
 			/**
@@ -68,10 +80,13 @@ Ext.onReady(function() {
 			var store = new Ext.data.Store({
 						// 获取数据的方式
 						proxy : new Ext.data.HttpProxy({
-									url :'busruntime.do?reqCode=queryTimebyRoute'
+									url :'busruntime.do?reqCode=queryCompareBustime'
 								}),
 						// 数据读取器
-						reader : new Ext.data.JsonReader({},[ {
+						reader : new Ext.data.JsonReader({
+							totalProperty : 'TOTALCOUNT', // 记录总数
+							root : 'ROOT' // Json中的列表数据根节点
+						},[ {
 											name : 'routename'
 										}, {
 											name : 'rundate'
@@ -80,16 +95,19 @@ Ext.onReady(function() {
 										}, {
 											name : 'weather'
 										}, {
-											name : 'downav'
+											name : 'starttime'
 										}, {
 											
-											name : 'downpuls'
+											name : 'triptime'
 										}, {
 											
-											name : 'upav'
+											name : 'pretime'
 										}, {
 											
-											name : 'uppuls'
+											name : 'plustime'
+										}, {
+											
+											name : 'routeavtime'
 										}])
 					});
 
@@ -116,6 +134,30 @@ Ext.onReady(function() {
 						editable : false,
 						width : 85
 					});
+			var number = parseInt(pagesize_combo.getValue());
+			// 改变每页显示条数reload数据
+			pagesize_combo.on("select", function(comboBox) {
+						bbar.pageSize = parseInt(comboBox.getValue());
+						number = parseInt(comboBox.getValue());
+						store.reload({
+									params : {
+										start : 0,
+										limit : bbar.pageSize
+									}
+								});
+					});
+
+			// 分页工具栏
+			var bbar = new Ext.PagingToolbar({
+						pageSize : number,
+						store : store,
+						displayInfo : true,
+						displayMsg : '显示{0}条到{1}条,共{2}条',
+						plugins : new Ext.ux.ProgressBarPager(), // 分页进度条
+						emptyMsg : "没有符合条件的记录",
+						items : ['-', '&nbsp;&nbsp;', pagesize_combo]
+					});
+
 			
 			// 表格工具栏
 			var tbar = new Ext.Toolbar({
@@ -164,7 +206,26 @@ Ext.onReady(function() {
 									// value:'0002',
 									resizable : true,
 									anchor : '100%'
-								}), {
+								}),  {
+									text : '选择车辆',
+									iconCls : 'page_findIcon'
+									
+								},{
+									xtype : 'textfield',
+									id : 'selectproductid',
+									name : 'selectproductid',
+									emptyText : '请输入车辆编号',
+									width : 150,
+									enableKeyEvents : true,
+									// 响应回车键
+									listeners : {
+										specialkey : function(field, e) {
+											if (e.getKey() == Ext.EventObject.ENTER) {
+												queryCatalogItem();
+											}
+										}
+									}
+								},{
 									text : '查询',
 									iconCls : 'page_findIcon',
 									handler : function() {
@@ -220,7 +281,7 @@ Ext.onReady(function() {
 			// 表格实例
 			var grid = new Ext.grid.GridPanel({
 						// 表格面板标题,默认为粗体，我不喜欢粗体，这里设置样式将其格式为正常字体
-						title : '<span class="commoncss">表格综合演示一</span>',
+						title : '<span class="commoncss">分线路单车周转时间对比</span>',
 						margins : '3 3 3 3',
 						height : 500,
 						frame : true,
@@ -231,7 +292,7 @@ Ext.onReady(function() {
 						cm : cm, // 列模型
 						sm : sm, // 复选框
 						tbar : tbar, // 表格工具栏
-			//			bbar : bbar,// 分页工具栏
+						bbar : bbar,// 分页工具栏
 						viewConfig : {
 			// 不产横向生滚动条, 各列自动扩展自动压缩, 适用于列数比较少的情况
 						// forceFit : true
@@ -295,7 +356,7 @@ Ext.onReady(function() {
 			function queryCatalogItem() {
 				store.load({
 							params : {
-								selectroute : Ext.getCmp('selectroute').getValue()
+								selectproductid : Ext.getCmp('selectproductid').getValue()
 							}
 						});
 			}

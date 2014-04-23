@@ -40,6 +40,49 @@
 			
 			 group by t.ROUTEID
 		</dynamic>
+		
+		
+		
+		
+	</select>
+	
+	<select id="compareBustime" parameterClass="map" resultClass="dto">
+	
+	select a.ROUTEID as routename , a.rundate  ,a.StartTime,as_triptime as triptime ,b.downav as pretime,
+		b.downpuls as plustime 
+  	 from  (SELECT time_format(n.TripTime ,'%H.%i.%s') as as_triptime ,time_format(n.Startdate,'%H.%i.%s') as rundate,time_format(n.StartTime,'%H.%i.%s') as StartTime,n.ROUTEID as ROUTEID
+
+ FROM tb_triptime n where n.PRODUCTID =#selectproductid# ) a 
+left join (SELECT 
+ 
+time_format(SEC_TO_TIME(stddev(TIME_TO_SEC(t.StartToMiddle))),'%H.%i.%s') as downpuls,
+		time_format(SEC_TO_TIME(avg(TIME_TO_SEC(t.StartToMiddle))),'%H.%i.%s')
+		 as downav  ,
+
+
+		time_format(SEC_TO_TIME(stddev(TIME_TO_SEC(t.MiddleToEnd))),'%H.%i.%s') as uppuls,
+			time_format(SEC_TO_TIME(avg(TIME_TO_SEC(t.MiddleToEnd))),'%H.%i.%s') as upav,
+
+t.ROUTEID  FROM tb_triptime t where 1=1 group by t.ROUTEID  ) b on a.ROUTEID = b.ROUTEID
+	</select>
+	
+	<select id="countcompareBustime" parameterClass="map" resultClass="java.lang.Integer">
+	
+	select count(*)
+  	 from  (SELECT * 
+
+ FROM tb_triptime n where n.PRODUCTID =#selectproductid# ) a 
+left join (SELECT 
+ 
+time_format(SEC_TO_TIME(stddev(TIME_TO_SEC(t.StartToMiddle))),'%H.%i.%s') as downpuls,
+		time_format(SEC_TO_TIME(avg(TIME_TO_SEC(t.StartToMiddle))),'%H.%i.%s')
+		 as downav  ,
+
+
+		time_format(SEC_TO_TIME(stddev(TIME_TO_SEC(t.MiddleToEnd))),'%H.%i.%s') as uppuls,
+			time_format(SEC_TO_TIME(avg(TIME_TO_SEC(t.MiddleToEnd))),'%H.%i.%s') as upav,
+
+t.ROUTEID  FROM tb_triptime t where 1=1 group by t.ROUTEID  ) b on a.ROUTEID = b.ROUTEID
 	</select>
 	
 </sqlMap>

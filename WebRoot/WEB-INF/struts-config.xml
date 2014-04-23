@@ -129,6 +129,7 @@
 			type="org.bus.runtime.web.BusRunTimeAction">
 			
 			<forward name="calculateTimeInitView" path="/app/modules/busruntime/showbustime.jsp" />
+			<forward name="compareTimeInitView" path="/app/modules/busruntime/compareshowbustime.jsp" />
 			</action>
 	</action-mappings>
 
