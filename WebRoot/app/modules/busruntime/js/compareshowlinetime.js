@@ -249,7 +249,7 @@ Ext.onReady(function() {
 			// 表格实例
 			var grid = new Ext.grid.GridPanel({
 						// 表格面板标题,默认为粗体，我不喜欢粗体，这里设置样式将其格式为正常字体
-						title : '<span class="commoncss">表格综合演示一</span>',
+						title : '<span class="commoncss">线路周转时间验证</span>',
 						margins : '3 3 3 3',
 						height : 500,
 						frame : true,

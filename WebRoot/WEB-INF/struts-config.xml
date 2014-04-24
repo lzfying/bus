@@ -130,6 +130,7 @@
 			
 			<forward name="calculateTimeInitView" path="/app/modules/busruntime/showbustime.jsp" />
 			<forward name="compareTimeInitView" path="/app/modules/busruntime/compareshowbustime.jsp" />
+			<forward name="proveTimeInitView" path="/app/modules/busruntime/compareshowlinetime.jsp" />
 			</action>
 	</action-mappings>
 

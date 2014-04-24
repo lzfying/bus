@@ -85,4 +85,26 @@ time_format(SEC_TO_TIME(stddev(TIME_TO_SEC(t.StartToMiddle))),'%H.%i.%s') as dow
 t.ROUTEID  FROM tb_triptime t where 1=1 group by t.ROUTEID  ) b on a.ROUTEID = b.ROUTEID
 	</select>
 	
+	<select id="queryCompanyDatas" parameterClass="map" resultClass="dto">
+		SELECT DEPTID as value, DEPTNAME as text
+		FROM eadept
+		<dynamic prepend="where">
+			
+			<isNotEmpty prepend="and" property="deptlength">
+				length(DEPTID) = $deptlength$
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<select id="queryrouteDatas" parameterClass="map" resultClass="dto">
+		SELECT id as value, routename as text
+		FROM meta_dept_route
+		<dynamic prepend="where">
+			
+			<isNotEmpty prepend="and" property="deptid">
+				DEPTID = #routename#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
 </sqlMap>

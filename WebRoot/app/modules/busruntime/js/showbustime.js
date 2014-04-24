@@ -5,6 +5,149 @@
  * @since 2014-4-15
  */
 Ext.onReady(function() {
+	
+	
+	var companyStore = new Ext.data.Store({
+		proxy : new Ext.data.HttpProxy({
+					url : 'busruntime.do?reqCode=queryCompanyDatas'
+				}),
+		reader : new Ext.data.JsonReader({}, [{
+							name : 'value'
+						}, {
+							name : 'text'
+						}]),
+		baseParams : {
+			areacodelength : '2'
+		}
+	});
+// areaStore.load(); //如果mode : 'local',时候才需要手动load();
+
+var companyCombo = new Ext.form.ComboBox({
+		hiddenName : 'companyName',
+		fieldLabel : '分公司',
+		emptyText : '请选择分公司...',
+		triggerAction : 'all',
+		store : companyStore,
+		displayField : 'text',
+		valueField : 'value',
+		loadingText : '正在加载数据...',
+		mode : 'remote', // 数据会自动读取,如果设置为local又调用了store.load()则会读取2次；也可以将其设置为local，然后通过store.load()方法来读取
+		forceSelection : true,
+		typeAhead : true,
+		resizable : true,
+		editable : false,
+		anchor : '100%'
+	});
+
+companyCombo.on('select', function() {
+		cityCombo.reset();
+		
+		var value = companyCombo.getValue();
+		routeStore.load({
+					params : {
+						companyid : value
+					}
+				});
+	});
+
+var routeStore = new Ext.data.Store({
+		proxy : new Ext.data.HttpProxy({
+					url : 'busruntime.do?reqCode=queryrouteDatas'
+				}),
+		reader : new Ext.data.JsonReader({}, [{
+							name : 'value'
+						}, {
+							name : 'text'
+						}]),
+		baseParams : {
+			areacodelength : '4'
+		}
+	});
+
+var routeCombo = new Ext.form.ComboBox({
+	hiddenName : 'selectroute',
+	fieldLabel : '线路',
+	emptyText : '请选择线路...',
+	triggerAction : 'all',
+	store : routeStore,
+	displayField : 'text',
+	valueField : 'value',
+	loadingText : '正在加载数据...',
+	mode : 'local', // 数据会自动读取,如果设置为local又调用了store.load()则会读取2次；也可以将其设置为local，然后通过store.load()方法来读取
+	forceSelection : true,
+	typeAhead : true,
+	resizable : true,
+	editable : false,
+	anchor : '100%'
+});
+
+	
+	var qForm = new Ext.form.FormPanel({
+		region : 'north',
+		margins : '3 3 3 3',
+		title : '<span class="commoncss">查询条件<span>',
+		collapsible : true,
+		border : true,
+		labelWidth : 90, // 标签宽度
+		// frame : true, //是否渲染表单面板背景色
+		labelAlign : 'right', // 标签对齐方式
+		bodyStyle : 'padding:3 5 0', // 表单元素和表单面板的边距
+		buttonAlign : 'center',
+		height : 125,
+		items : [{
+					layout : 'column',
+					border : false,
+					items : [{
+								columnWidth : .5,
+								layout : 'form',
+								labelWidth : 60, // 标签宽度
+								defaultType : 'textfield',
+								border : false,
+								items : [companyCombo,routeCombo]
+							}, {
+								columnWidth : .5,
+								layout : 'form',
+								labelWidth : 60, // 标签宽度
+								defaultType : 'textfield',
+								border : false,
+								items : [{
+							        xtype : 'datefield',
+									fieldLabel : '日期', // 标签
+									name : 'datetime', // name:后台根据此name属性取值 
+									format:'Y-m-d', //日期格式化
+									maxValue:'2014-12-31', //允许选择的最大日期
+									minValue:'2014-01-01', //允许选择的最小日期
+									anchor : '100%' // 宽度百分比
+								}, {
+											fieldLabel : '时段',
+											name : 'timebank',
+											xtype : 'numberfield', // 设置为数字输入框类型
+											allowDecimals : false, // 是否允许输入小数
+											allowNegative : false, // 是否允许输入负数
+											maxValue : 120,
+											anchor : '100%'
+										}]
+							}]
+				}],
+		buttons : [{
+					text : '查询',
+					iconCls : 'previewIcon',
+					handler : function() {
+						queryBalanceInfo(qForm.getForm());
+					}
+				}, {
+					text : '重置',
+					iconCls : 'tbar_synchronizeIcon',
+					handler : function() {
+						qForm.getForm().reset();
+					}
+				}]
+	});
+	
+	
+	
+	
+	
 			// 复选框
 			var sm = new Ext.grid.CheckboxSelectionModel();
 
@@ -95,9 +238,7 @@ Ext.onReady(function() {
 
 			// 翻页排序时带上查询条件
 			store.on('beforeload', function() {
-						this.baseParams = {
-							xmmc : Ext.getCmp('xmmc').getValue()
-						};
+				this.baseParams = qForm.getForm().getValues();
 					});
 			// 每页显示条数下拉选择框
 			var pagesize_combo = new Ext.form.ComboBox({
@@ -288,7 +429,7 @@ Ext.onReady(function() {
 			// 布局模型
 			var viewport = new Ext.Viewport({
 						layout : 'border',
-						items : [grid]
+						items : [qForm, grid]
 					});
 
 			// 查询表格数据
@@ -297,6 +438,16 @@ Ext.onReady(function() {
 							params : {
 								selectroute : Ext.getCmp('selectroute').getValue()
 							}
+						});
+			}
+			
+			// 查询表格数据
+			function queryBalanceInfo(pForm) {
+				var params = pForm.getValues();
+				//params.start = 0;
+				//params.limit = bbar.pageSize;
+				store.load({
+							params : params
 						});
 			}
 

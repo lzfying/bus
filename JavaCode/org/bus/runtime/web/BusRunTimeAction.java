@@ -57,6 +57,21 @@ public class BusRunTimeAction extends BizAction {
 		return mapping.findForward("compareTimeInitView");
 	}
 	
+	/**
+	 * 分线路单车实际周转时间对比
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward proveTimeInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		
+		return mapping.findForward("proveTimeInitView");
+	}
 	
 	
 	
@@ -108,6 +123,26 @@ public class BusRunTimeAction extends BizAction {
 		return mapping.findForward(null);
 	}
 	
+	
+	public ActionForward queryCompanyDatas(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		CommonActionForm aForm = (CommonActionForm) form;
+		Dto dto = aForm.getParamAsDto(request);
+		List areaList = g4Reader.queryForList("Bus.getcompanylist", dto);
+		String jsonString = JsonHelper.encodeObject2Json(areaList);
+		write(jsonString, response);
+		return mapping.findForward(null);
+	}
+	
+	public ActionForward queryrouteDatas(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		CommonActionForm aForm = (CommonActionForm) form;
+		Dto dto = aForm.getParamAsDto(request);
+		List areaList = g4Reader.queryForList("Bus.getroutelist", dto);
+		String jsonString = JsonHelper.encodeObject2Json(areaList);
+		write(jsonString, response);
+		return mapping.findForward(null);
+	}
 	
 	/**
 	 * 保存表格脏数据
