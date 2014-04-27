@@ -209,7 +209,7 @@ ${scriptEnd}
 <table border="0" cellpadding="0" cellspacing="0" width="100%"  
 	height="60" background="./resource/image/banner_background/${theme}.png">
 	<tr >
-		<td style="padding-left:15px"><img class="IEPNG"
+		<td style="padding-left:0px"><img class="IEPNG"
 			src="${banner}" />
 		</td>
 		<td style="padding-right:5px">
