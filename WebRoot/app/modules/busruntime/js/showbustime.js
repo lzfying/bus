@@ -17,7 +17,7 @@ Ext.onReady(function() {
 							name : 'text'
 						}]),
 		baseParams : {
-			areacodelength : '2'
+			deptlength : '9'
 		}
 	});
 // areaStore.load(); //如果mode : 'local',时候才需要手动load();
@@ -40,12 +40,12 @@ var companyCombo = new Ext.form.ComboBox({
 	});
 
 companyCombo.on('select', function() {
-		cityCombo.reset();
+	routeCombo.reset();
 		
 		var value = companyCombo.getValue();
 		routeStore.load({
 					params : {
-						companyid : value
+						deptid : value
 					}
 				});
 	});
@@ -58,10 +58,7 @@ var routeStore = new Ext.data.Store({
 							name : 'value'
 						}, {
 							name : 'text'
-						}]),
-		baseParams : {
-			areacodelength : '4'
-		}
+						}])
 	});
 
 var routeCombo = new Ext.form.ComboBox({
@@ -258,80 +255,7 @@ var routeCombo = new Ext.form.ComboBox({
 						width : 85
 					});
 			
-			// 表格工具栏
-			var tbar = new Ext.Toolbar({
-						items : [{
-							text : '分公司'
-							
-						},{
-									xtype : 'textfield',
-									id : 'xmmc',
-									name : 'xmmc',
-									emptyText : '请输入项目名称',
-									width : 150,
-									enableKeyEvents : true,
-									// 响应回车键
-									listeners : {
-										specialkey : function(field, e) {
-											if (e.getKey() == Ext.EventObject.ENTER) {
-												queryCatalogItem();
-											}
-										}
-									}
-								}, {
-									text : '选择线路',
-									iconCls : 'page_findIcon'
-									
-								},new Ext.form.ComboBox({
-									id:'selectroute',
-									hiddenName : 'selectroute',
-									fieldLabel : '线路',
-									emptyText : '请选择',
-									triggerAction : 'all',
-									store : new Ext.data.SimpleStore({
-												fields : ['name',
-														'code'],
-												data : [['1路', '1'],
-														['167路', '167'],
-														['56路', '56'],
-														['85路', '85']]
-											}),
-									displayField : 'name',
-									valueField : 'code',
-									mode : 'local',
-									forceSelection : false, // 选中内容必须为下拉列表的子项
-									editable : false,
-									typeAhead : true,
-									// value:'0002',
-									resizable : true,
-									anchor : '100%'
-								}), {
-									text : '查询',
-									iconCls : 'page_findIcon',
-									handler : function() {
-										queryCatalogItem();
-									}
-								}, {
-									text : '刷新',
-									iconCls : 'page_refreshIcon',
-									handler : function() {
-										store.reload();
-									}
-								}, '-', {
-									text : '获取选择行',
-									handler : function() {
-										getCheckboxValues();
-									}
-								},'-', {
-									text : '导出',
-									tooltip : '以仿Ajax方式导出,界面无刷新',
-									iconCls : 'page_excelIcon',
-									handler : function() {
-										exportExcel('excelReportDemo.do?reqCode=exportExcel2');
-									}
-								}]
-					});
-
+			
 			// 表格右键菜单
 			var contextmenu = new Ext.menu.Menu({
 						id : 'theContextMenu',
@@ -361,7 +285,7 @@ var routeCombo = new Ext.form.ComboBox({
 			// 表格实例
 			var grid = new Ext.grid.GridPanel({
 						// 表格面板标题,默认为粗体，我不喜欢粗体，这里设置样式将其格式为正常字体
-						title : '<span class="commoncss">表格综合演示一</span>',
+						
 						margins : '3 3 3 3',
 						height : 500,
 						frame : true,
@@ -371,7 +295,7 @@ var routeCombo = new Ext.form.ComboBox({
 						stripeRows : true, // 斑马线
 						cm : cm, // 列模型
 						sm : sm, // 复选框
-						tbar : tbar, // 表格工具栏
+			//			tbar : tbar, // 表格工具栏
 			//			bbar : bbar,// 分页工具栏
 						viewConfig : {
 			// 不产横向生滚动条, 各列自动扩展自动压缩, 适用于列数比较少的情况

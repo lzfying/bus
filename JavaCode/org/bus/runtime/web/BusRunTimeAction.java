@@ -77,6 +77,23 @@ public class BusRunTimeAction extends BizAction {
 	
 	
 	/**
+	 * 地图线路展示
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward routeshowBymap(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		
+		return mapping.findForward("routeshowBymapView");
+	}
+	
+	
+	/**
 	 * 查询周转预测
 	 * 
 	 * @param mapping
@@ -128,7 +145,7 @@ public class BusRunTimeAction extends BizAction {
 			HttpServletResponse response) throws Exception {
 		CommonActionForm aForm = (CommonActionForm) form;
 		Dto dto = aForm.getParamAsDto(request);
-		List areaList = g4Reader.queryForList("Bus.getcompanylist", dto);
+		List areaList = g4Reader.queryForList("Bus.queryCompanyDatas", dto);
 		String jsonString = JsonHelper.encodeObject2Json(areaList);
 		write(jsonString, response);
 		return mapping.findForward(null);
@@ -138,7 +155,7 @@ public class BusRunTimeAction extends BizAction {
 			HttpServletResponse response) throws Exception {
 		CommonActionForm aForm = (CommonActionForm) form;
 		Dto dto = aForm.getParamAsDto(request);
-		List areaList = g4Reader.queryForList("Bus.getroutelist", dto);
+		List areaList = g4Reader.queryForList("Bus.queryrouteDatas", dto);
 		String jsonString = JsonHelper.encodeObject2Json(areaList);
 		write(jsonString, response);
 		return mapping.findForward(null);

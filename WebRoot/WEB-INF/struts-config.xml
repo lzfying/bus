@@ -132,6 +132,15 @@
 			<forward name="compareTimeInitView" path="/app/modules/busruntime/compareshowbustime.jsp" />
 			<forward name="proveTimeInitView" path="/app/modules/busruntime/compareshowlinetime.jsp" />
 			</action>
+			
+		<action name="commonActionForm" path="/mapshow" scope="request"
+			parameter="reqCode"
+			type="org.bus.runtime.web.BusRunTimeAction">
+			
+			<forward name="routeshowBymapView" path="/app/MapJiNanv2/index_1.jsp" />
+			<forward name="compareTimeInitView" path="/app/modules/busruntime/compareshowbustime.jsp" />
+			<forward name="proveTimeInitView" path="/app/modules/busruntime/compareshowlinetime.jsp" />
+			</action>	
 	</action-mappings>
 
 </struts-config>

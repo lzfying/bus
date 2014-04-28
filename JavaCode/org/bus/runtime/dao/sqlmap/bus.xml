@@ -102,7 +102,7 @@ t.ROUTEID  FROM tb_triptime t where 1=1 group by t.ROUTEID  ) b on a.ROUTEID = b
 		<dynamic prepend="where">
 			
 			<isNotEmpty prepend="and" property="deptid">
-				DEPTID = #routename#
+				DEPTID = #deptid#
 			</isNotEmpty>
 		</dynamic>
 	</select>
