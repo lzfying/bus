@@ -17,7 +17,7 @@ Ext.onReady(function() {
 							name : 'text'
 						}]),
 		baseParams : {
-			deptlength : '9'
+			deptlength : '6'
 		}
 	});
 // areaStore.load(); //如果mode : 'local',时候才需要手动load();
@@ -36,6 +36,7 @@ var companyCombo = new Ext.form.ComboBox({
 		typeAhead : true,
 		resizable : true,
 		editable : false,
+		allowBlank : false,
 		anchor : '100%'
 	});
 
@@ -75,6 +76,7 @@ var routeCombo = new Ext.form.ComboBox({
 	typeAhead : true,
 	resizable : true,
 	editable : false,
+	allowBlank : false,
 	anchor : '100%'
 });
 
@@ -95,34 +97,48 @@ var routeCombo = new Ext.form.ComboBox({
 					layout : 'column',
 					border : false,
 					items : [{
-								columnWidth : .5,
+								columnWidth : .33,
 								layout : 'form',
 								labelWidth : 60, // 标签宽度
 								defaultType : 'textfield',
 								border : false,
 								items : [companyCombo,routeCombo]
 							}, {
-								columnWidth : .5,
+								columnWidth : .33,
 								layout : 'form',
 								labelWidth : 60, // 标签宽度
 								defaultType : 'textfield',
 								border : false,
 								items : [{
+									fieldLabel : '时段从',
+									name : 'timebank1',
+									xtype : 'numberfield', // 设置为数字输入框类型
+									allowDecimals : false, // 是否允许输入小数
+									allowNegative : false, // 是否允许输入负数
+									maxValue : 120,
+									anchor : '100%'
+								},{
 							        xtype : 'datefield',
 									fieldLabel : '日期', // 标签
+									id:'datetime',
 									name : 'datetime', // name:后台根据此name属性取值 
 									format:'Y-m-d', //日期格式化
 									maxValue:'2014-12-31', //允许选择的最大日期
-									minValue:'2014-01-01', //允许选择的最小日期
+									minValue:'2014-05-01', //允许选择的最小日期
 									anchor : '100%' // 宽度百分比
-								}, {
-											fieldLabel : '时段',
-											name : 'timebank',
-											xtype : 'numberfield', // 设置为数字输入框类型
-											allowDecimals : false, // 是否允许输入小数
-											allowNegative : false, // 是否允许输入负数
-											maxValue : 120,
-											anchor : '100%'
+								}]
+							}, {
+								columnWidth : .33,
+								layout : 'form',
+								labelWidth : 60, // 标签宽度
+								defaultType : 'textfield',
+								border : false,
+								items : [{
+											fieldLabel : '到', // 标签
+											name : 'timebank2', // name:后台根据此name属性取值
+											maxLength : 20, // 可输入的最大文本长度,不区分中英文字符
+											allowBlank : true,
+											anchor : '100%'// 宽度百分比
 										}]
 							}]
 				}],
@@ -130,6 +146,9 @@ var routeCombo = new Ext.form.ComboBox({
 					text : '查询',
 					iconCls : 'previewIcon',
 					handler : function() {
+						if (!qForm.form.isValid()) {
+							return;
+						}
 						queryBalanceInfo(qForm.getForm());
 					}
 				}, {
@@ -155,12 +174,7 @@ var routeCombo = new Ext.form.ComboBox({
 					});
 
 			// 定义列模型
-			var cm = new Ext.grid.ColumnModel([rownum, sm, {
-						header : '操作', // 列标题
-						dataIndex : 'edit',
-						width : 35,
-						renderer : iconColumnRender
-					},  {
+			var cm = new Ext.grid.ColumnModel([rownum, sm,   {
 						header : '线路',
 						dataIndex : 'routename',
 						//hidden : true, // 隐藏列
@@ -177,7 +191,12 @@ var routeCombo = new Ext.form.ComboBox({
 						dataIndex : 'week',
 						width : 30,
 						renderer:function(value){
-							
+							var weekDay = ["星期天", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
+							//alert("sss sd"+Ext.getCmp('datetime').value);
+							Ext.get('datetime'); 
+					        var dateStr = "2008-08-08 08:08:08";
+					        var myDate = new Date(Date.parse(dateStr.replace(/-/g, "/"))); 
+					        //alert(weekDay[myDate.getDay()]);
 							
 						}
 					}, {
@@ -185,21 +204,45 @@ var routeCombo = new Ext.form.ComboBox({
 						width : 80,
 						dataIndex : 'weather'
 					}, {
-						header : '下行周转预测均值',
+						header : '时段',
 						width : 150,
-						dataIndex : 'downav'
+						dataIndex : 'timeinterval',
+						renderer:function(value){
+							value = value.replace("[","(");
+							return value;
+						}
+					},  {
+						header : '周转预测均值(分钟)',
+						width : 150,
+						dataIndex : 'avtime',
+						renderer:function(value){
+							return value.toFixed(2);
+						}
+						
+					},{
+						header : '周转时间预测波动值(分钟)',
+						width : 150,
+						dataIndex : 'totaltime',
+						renderer:function(value){
+							return value.toFixed(2);
+						}
 					}, {
-						header : '下行周转时间预测波动值',
+						header : '上行／下行',
 						width : 150,
-						dataIndex : 'downpuls'
-					}, {
-						header : '上行周转时间预测均值',
-						width : 150,
-						dataIndex : 'upav'
-					}, {
-						header : '上行周转时间预测波动值',
-						width : 150,
-						dataIndex : 'uppuls'
+						dataIndex : 'upordown',
+						renderer:function(value){
+							if(value=="Up"){
+								return "上行";
+							}
+							else if(value=="Down"){
+								return "下行";
+							}
+							else {
+								return "none";
+								
+							}
+							
+						}
 					}]);
 
 			/**
@@ -220,16 +263,15 @@ var routeCombo = new Ext.form.ComboBox({
 										}, {
 											name : 'weather'
 										}, {
-											name : 'downav'
+											name : 'timeinterval'
+										},  {
+											name : 'avtime'
+										},{
+											
+											name : 'totaltime'
 										}, {
 											
-											name : 'downpuls'
-										}, {
-											
-											name : 'upav'
-										}, {
-											
-											name : 'uppuls'
+											name : 'upordown'
 										}])
 					});
 

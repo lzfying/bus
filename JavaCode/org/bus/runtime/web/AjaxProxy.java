@@ -7,6 +7,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Enumeration;
 
 import javax.servlet.ServletConfig;
@@ -51,22 +52,22 @@ public class AjaxProxy extends HttpServlet{
 	
 	public String proxy1(HttpServletRequest req, HttpServletResponse resp) throws HttpException, IOException{
 		Enumeration paramNames = req.getParameterNames();
-	      StringBuffer bfParams = new StringBuffer("http://192.168.1.100:8081/Read_Data.aspx?");
+	      StringBuffer bfParams = new StringBuffer("http://127.0.0.1:8084/Read_Data.aspx?");
 	      //bfParams.append(req.getParameter("url")).append("?1=1");
 	      while(paramNames.hasMoreElements()) {
 	          String param = (String)paramNames.nextElement();
 	         
-	          bfParams.append(param).append("=").append(req.getParameter(param)).append("&");
+	          bfParams.append(param).append("=").append( URLEncoder.encode(req.getParameter(param), "utf-8")).append("&");
 	      }
 	      
 	        String url= bfParams.toString().substring(0, bfParams.toString().length()-1);
-	        System.out.println("eee"+url);
+	        System.out.println("URL::::::::::::"+url);
 			//设置代理服务器地址和端口  
 	        HttpClient client = new HttpClient();   
 	        //client.getHostConfiguration().setProxy("172.100.1.28",8080);  
 	        //使用GET方法，如果服务器需要通过HTTPS连接，那只需要将下面URL中的http换成https  
 	        client.setTimeout(6000);  
-	        
+	       
 	       
 	        HttpMethod method = new GetMethod(url);  
 	        //使用POST方法  

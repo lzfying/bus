@@ -1,5 +1,6 @@
 package org.bus.runtime.web;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -105,8 +106,38 @@ public class BusRunTimeAction extends BizAction {
 	 */
 	public ActionForward queryTimebyRoute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
+		 java.text.DateFormat format1 = new java.text.SimpleDateFormat("yyyy-MM-dd");
 		CommonActionForm aForm = (CommonActionForm) form;
 		Dto dto = aForm.getParamAsDto(request);
+		String datetime =dto.getAsString("datetime");
+		String temp=null;
+		if(!datetime.equals("")){
+			
+			 temp = datetime.substring(datetime.lastIndexOf("-")+1, datetime.length());
+		}else{
+			
+			datetime=format1.format(new Date());
+			temp =  datetime.substring(datetime.lastIndexOf("-")+1, datetime.length());
+			
+		}
+
+		int day= Integer.parseInt(temp) ;
+		if(day>1&&day<=10){
+			dto.put("bit1", 0.5);
+			dto.put("bit2", 0.3);
+			dto.put("bit3", 0.2);
+		}else if(day>10&&day<=20){
+			
+			dto.put("bit1", 0.3);
+			dto.put("bit2", 0.5);
+			dto.put("bit3", 0.2);
+		}else{
+			
+			dto.put("bit1", 0.2);
+			dto.put("bit2", 0.3);
+			dto.put("bit3", 0.5);
+		}
+		dto.put("route", dto.getAsString("selectroute"));
 		
 		
 		List list = g4Reader.queryForList("Bus.countStddev", dto);

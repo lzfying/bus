@@ -21,7 +21,7 @@
 	<procedure id="g4_prc_cursor_demo" parameterMap="prcdto_cur">{call g4_prc_cursor_demo(?,?,?,?)}</procedure>
 	
 	
-	<select id="countStddev" parameterClass="map" resultClass="dto">
+	<select id="countStddev_bak" parameterClass="map" resultClass="dto">
 		SELECT 
 		
 		time_format(SEC_TO_TIME(stddev(TIME_TO_SEC(t.StartToMiddle))),'%H.%i.%s') as downpuls,
@@ -46,24 +46,113 @@
 		
 	</select>
 	
+	
+	<select id="countStddev" parameterClass="map" resultClass="dto">
+		
+		select  aa.ROUTEID as routename, aa.time1,bb.time2,cc.time3,(time1+time2+time3) as totaltime ,
+		(aa.avtime1+bb.avtime2+cc.avtime3) as avtime, aa.UporDown as upordown,aa.TimeSection as timeinterval
+		
+
+			from 
+			( SELECT 
+			t.TimeSection,t.UporDown,t.TimeInterval,
+
+			time_format(SEC_TO_TIME(stddev((TIME_TO_SEC(t.triptime)*#bit1#))),'%i.%s') as time1,
+			time_format(SEC_TO_TIME(avg(TIME_TO_SEC(t.triptime)*#bit1#)),'%i.%s') as avtime1,
+
+			
+
+			t.ROUTEID  FROM bus.tb_triptime t where 1=1 
+			
+			<dynamic>
+			
+			<isNotEmpty prepend="AND" property="route">
+				t.ROUTEID = #route#
+			</isNotEmpty>
+			
+			</dynamic>
+ 				and   
+ 				  <![CDATA[
+             t.Startdate>str_to_date("2014-03-26 ",'%Y-%m-%d ')  and t.Startdate<str_to_date("2014-04-05 ",'%Y-%m-%d ')
+ 			
+      ]]>
+ 					
+ 				group by t.ROUTEID  ,t.TimeInterval order by t.TimeInterval) aa,
+
+
+			( SELECT 
+			t.TimeSection,t.UporDown,t.TimeInterval,
+
+ 
+			time_format(SEC_TO_TIME(stddev((TIME_TO_SEC(t.triptime)*#bit2#))),'%i.%s') as time2,
+			time_format(SEC_TO_TIME(avg(TIME_TO_SEC(t.triptime)*#bit2#)),'%i.%s') as avtime2,
+
+			
+
+				t.ROUTEID  FROM bus.tb_triptime t where 1=1 
+				<dynamic>
+			
+			<isNotEmpty prepend="AND" property="route">
+				t.ROUTEID = #route#
+			</isNotEmpty>
+			
+			</dynamic>
+ 				 and   
+ 				 <![CDATA[
+ 				
+ 				t.Startdate>str_to_date("2014-04-05 ",'%Y-%m-%d ')  and t.Startdate<str_to_date("2014-04-15 ",'%Y-%m-%d ') 
+ 				]]>
+ 				
+ 				group by t.ROUTEID  ,t.TimeInterval order by t.TimeInterval ) bb,
+
+			( SELECT 
+				t.TimeSection,t.UporDown,t.TimeInterval,
+				time_format(SEC_TO_TIME(stddev((TIME_TO_SEC(t.triptime)*#bit3#))),'%i.%s') as  time3,
+				time_format(SEC_TO_TIME(avg(TIME_TO_SEC(t.triptime)*#bit3#)),'%i.%s') as avtime3,
+				
+
+				t.ROUTEID  FROM bus.tb_triptime t where 1=1 
+				<dynamic>
+			
+			<isNotEmpty prepend="AND" property="route">
+				t.ROUTEID = #route#
+			</isNotEmpty>
+			
+			</dynamic>
+ 				 and 
+ 				<![CDATA[
+ 				  t.Startdate>str_to_date("2014-04-15 ",'%Y-%m-%d ')  and t.Startdate<str_to_date("2014-04-25 ",'%Y-%m-%d ') 
+ 				
+ 				]]>
+ 				group by t.ROUTEID  ,t.TimeInterval order by t.TimeInterval ) cc
+
+			where aa.TimeInterval = bb.TimeInterval and bb.TimeInterval = cc.TimeInterval
+
+ 
+
+
+		
+		
+		
+	</select>
+	
+	
 	<select id="compareBustime" parameterClass="map" resultClass="dto">
 	
 	select a.ROUTEID as routename , a.rundate  ,a.StartTime,as_triptime as triptime ,b.downav as pretime,
-		b.downpuls as plustime 
-  	 from  (SELECT time_format(n.TripTime ,'%H.%i.%s') as as_triptime ,time_format(n.Startdate,'%H.%i.%s') as rundate,time_format(n.StartTime,'%H.%i.%s') as StartTime,n.ROUTEID as ROUTEID
+		b.downpuls as plustime ,
+b.TimeInterval 
 
- FROM tb_triptime n where n.PRODUCTID =#selectproductid# ) a 
-left join (SELECT 
+  	 from  (SELECT time_format(n.TripTime ,'%H.%i.%s') as as_triptime ,n.Startdate as rundate,time_format(n.StartTime,'%H.%i.%s') as StartTime,n.ROUTEID as ROUTEID
+
+ FROM tb_triptime n where n.PRODUCTID ==#selectproductid#) a 
+left join (SELECT t.TimeInterval ,
  
-time_format(SEC_TO_TIME(stddev(TIME_TO_SEC(t.StartToMiddle))),'%H.%i.%s') as downpuls,
-		time_format(SEC_TO_TIME(avg(TIME_TO_SEC(t.StartToMiddle))),'%H.%i.%s')
+time_format(SEC_TO_TIME(stddev(TIME_TO_SEC(t.triptime))),'%H.%i.%s') as downpuls,
+		time_format(SEC_TO_TIME(avg(TIME_TO_SEC(t.triptime))),'%H.%i.%s')
 		 as downav  ,
 
-
-		time_format(SEC_TO_TIME(stddev(TIME_TO_SEC(t.MiddleToEnd))),'%H.%i.%s') as uppuls,
-			time_format(SEC_TO_TIME(avg(TIME_TO_SEC(t.MiddleToEnd))),'%H.%i.%s') as upav,
-
-t.ROUTEID  FROM tb_triptime t where 1=1 group by t.ROUTEID  ) b on a.ROUTEID = b.ROUTEID
+t.ROUTEID  FROM tb_triptime t where 1=1  group by t.ROUTEID  ,t.TimeInterval order by t.TimeInterval  ) b on a.ROUTEID = b.ROUTEID
 	</select>
 	
 	<select id="countcompareBustime" parameterClass="map" resultClass="java.lang.Integer">
@@ -72,23 +161,13 @@ t.ROUTEID  FROM tb_triptime t where 1=1 group by t.ROUTEID  ) b on a.ROUTEID = b
   	 from  (SELECT * 
 
  FROM tb_triptime n where n.PRODUCTID =#selectproductid# ) a 
-left join (SELECT 
- 
-time_format(SEC_TO_TIME(stddev(TIME_TO_SEC(t.StartToMiddle))),'%H.%i.%s') as downpuls,
-		time_format(SEC_TO_TIME(avg(TIME_TO_SEC(t.StartToMiddle))),'%H.%i.%s')
-		 as downav  ,
 
-
-		time_format(SEC_TO_TIME(stddev(TIME_TO_SEC(t.MiddleToEnd))),'%H.%i.%s') as uppuls,
-			time_format(SEC_TO_TIME(avg(TIME_TO_SEC(t.MiddleToEnd))),'%H.%i.%s') as upav,
-
-t.ROUTEID  FROM tb_triptime t where 1=1 group by t.ROUTEID  ) b on a.ROUTEID = b.ROUTEID
 	</select>
 	
 	<select id="queryCompanyDatas" parameterClass="map" resultClass="dto">
 		SELECT DEPTID as value, DEPTNAME as text
-		FROM eadept
-		<dynamic prepend="where">
+		FROM eadept t where 1=1  and t.enabled='1'  
+		<dynamic >
 			
 			<isNotEmpty prepend="and" property="deptlength">
 				length(DEPTID) = $deptlength$
@@ -98,11 +177,11 @@ t.ROUTEID  FROM tb_triptime t where 1=1 group by t.ROUTEID  ) b on a.ROUTEID = b
 	
 	<select id="queryrouteDatas" parameterClass="map" resultClass="dto">
 		SELECT id as value, routename as text
-		FROM meta_dept_route
+		FROM meta_dept_route t 
 		<dynamic prepend="where">
 			
 			<isNotEmpty prepend="and" property="deptid">
-				DEPTID = #deptid#
+				DEPTID = $deptid$
 			</isNotEmpty>
 		</dynamic>
 	</select>
