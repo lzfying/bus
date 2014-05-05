@@ -110,6 +110,7 @@ var serv_ip="http://192.168.1.100:8081/";
 
 <%
 String path = request.getContextPath()+"/app/MapJiNanv2/";
+out.println(request.getParameter("qiehuan"));
 %>
 
 function change(){
@@ -1069,6 +1070,7 @@ function showCustomer(rou,fx,ys,iit)
       if (xmlHttp.readyState==4 && xmlHttp.status==200)
         {
         var strjwdd=xmlHttp.responseText;
+		//alert("ccc  "+strjwdd);
          mycars=strjwdd.split("*"); //字符分割 
     //     map.clearOverlays();//清楚地图覆盖物
          addPolyline(mycars,ys,iit);//向地图中添       
@@ -1077,8 +1079,12 @@ function showCustomer(rou,fx,ys,iit)
 //                    showalldiv();
         }
     }
-alert("ddd  "+encodeURI(fx));
-    var url="ajaxproxy?id=2&route="+rou+"&sxx="+encodeURI(fx);
+	if (fx=="上行")
+		fx=1;
+	else
+		fx=2;
+    var url="ajaxproxy?id=2&route="+rou+"&sxx="+fx;
+	//alert(url);
     xmlHttp.open("post",url,true);
     xmlHttp.send(null);
 }  
@@ -1116,6 +1122,7 @@ function station_road_info(rou,fx)
       if (xmlHttp.readyState==4 && xmlHttp.status==200)
         {
         var strjwdd=xmlHttp.responseText;
+		//alert(strjwdd);
          mycars=strjwdd.split("*"); //字符分割 
 //          addRow(mycars);
           for (var i = 0; i <mycars.length ; i ++) 
@@ -1128,9 +1135,13 @@ function station_road_info(rou,fx)
     }
 //    var t=document.getElementById("Select1");
   //  var url=serv_ip+"Read_Data.aspx?id=5&route5="+rou+"&sxx="+fx;
-  alert(fx);
-  alert(rou);
-  var url="ajaxproxy?id=5&route5="+rou+"&sxx="+encodeURI(fx);
+
+  if (fx=='上行')
+	fx=1;
+  else
+	fx=2;
+  var url="ajaxproxy?id=5&route5="+rou+"&sxx="+fx;
+  //alert(url);
     xmlHttp.open("post",url,true);
     xmlHttp.send(null);
  }
@@ -1253,7 +1264,7 @@ createXMLHTTP();
           }
         }
     }
-    var url=serv_ip+"Read_Data.aspx?id=29&swlng="+swlng+"&swlat="+swlat+"&nelng="+nelng+"&nelat="+nelat;
+    var url="ajaxproxy?id=29&swlng="+swlng+"&swlat="+swlat+"&nelng="+nelng+"&nelat="+nelat;
     xmlHttp.open("post",url,true);
     xmlHttp.send(null);
 }
@@ -1977,7 +1988,8 @@ var ima="<div style='text-align:center'><img src='/app/MapJiNanv2/images/loading
         }
     }
 
-    var url=serv_ip+"Read_Data.aspx?id=28&route="+rou+"&jm="+jing_mo;
+    var url="ajaxproxy?id=28&route="+rou+"&jm="+jing_mo;
+	//alert(url);
     xmlHttp.open("post",url,true);
     xmlHttp.send(null);
     
@@ -2198,6 +2210,6 @@ initMap();//创建和初始化地图
 
 
 document.getElementById("div_toppn").style.display="none";
-qiehuan(1);
+qiehuan(<%=request.getParameter("qiehuan")%>);
 </script>
 <script type="text/javascript" src="<%=path%>js/TextIconOverlay_min.js"></script>

@@ -1,5 +1,5 @@
 /**
- * 分线路单车周转时间验证表
+ * 线路每日各车超速查询
  * 
  * @author lz
  * @since 2014-4-15
@@ -117,6 +117,7 @@ var routeCombo = new Ext.form.ComboBox({
 									allowNegative : false, // 是否允许输入负数
 									hidden:true,
 									maxValue : 120,
+									//value:new Date().add(Date.DAY, -7),
 									anchor : '100%'
 								},{
 							        xtype : 'datefield',
@@ -138,8 +139,8 @@ var routeCombo = new Ext.form.ComboBox({
 											fieldLabel : '', // 标签
 											name : 'timebank2', // name:后台根据此name属性取值
 											maxLength : 20, // 可输入的最大文本长度,不区分中英文字符
-											allowBlank : true,
 											hidden:true,
+											allowBlank : true,
 											anchor : '100%'// 宽度百分比
 										}]
 							}]
@@ -178,89 +179,43 @@ var routeCombo = new Ext.form.ComboBox({
 			// 定义列模型
 			var cm = new Ext.grid.ColumnModel([rownum, sm,   {
 						header : '线路',
-						dataIndex : 'routename',
+						dataIndex : 'routeid',
 						//hidden : true, // 隐藏列
 						sortable : true,
 						width : 50
 						// 列宽
 				}	, {
 						header : '日期',
-						dataIndex : 'rundate',
+						dataIndex : 'date',
 						sortable : true,
-						width : 60
-					}, {
-						header : '星期',
-						dataIndex : 'week',
-						width : 30,
-						renderer:function(value){
-							var weekDay = ["星期天", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
-							//alert("sss sd"+Ext.getCmp('datetime').value);
-							Ext.get('datetime'); 
-					        var dateStr = "2008-08-08 08:08:08";
-					        var myDate = new Date(Date.parse(dateStr.replace(/-/g, "/"))); 
-					        //alert(weekDay[myDate.getDay()]);
-							
-						}
-					}, {
-						header : '天气',
-						width : 80,
-						dataIndex : 'weather'
-					}, {
+						width : 120
+					},  {
 						header : '时段',
-						width : 150,
-						dataIndex : 'timeinterval',
-						renderer:function(value){
-							value = value.replace("[","(");
-							return value;
-						}
+						width : 200,
+						dataIndex : 'time'
 					},{
 						header : '车载机编号',
 						width : 150,
 						dataIndex : 'productid'
-					},  {
-						header : '周转时间实际值(小时)',
-						width : 150,
-						dataIndex : 'triptime',
-						renderer:function(value){
-							//alert("dddd "+value);
-							//alert(Object.prototype.toString.apply(value));
-							
-							return value.substring(0,5);
-						}
+						
 						
 					},{
-						header : '预测周转时间(分钟)',
+						header : '站点编号',
 						width : 150,
-						dataIndex : 'avtime',
-						renderer:function(value){
-							return value.toFixed(2);
-							
-						}
-					},{
-						header : '差值(分钟)',
-						width : 150,
-						dataIndex : 'totaltime',
-						renderer:function(value){
-							return value.toFixed(2);
-							
-						}
+						dataIndex : 'station'
 					}, {
-						header : '上行／下行',
+						header : '超速值',
 						width : 150,
-						dataIndex : 'upordown',
+						dataIndex : 'nowvalue'
+					},{
+						header : '超速百分比',
+						width : 150,
+						dataIndex : 'overrate',
 						renderer:function(value){
-							if(value=="Up"){
-								return "上行";
-							}
-							else if(value=="Down"){
-								return "下行";
-							}
-							else {
-								return "none";
-								
-							}
-							
+							//alert(Object.prototype.toString.apply(value));
+							return value.toFixed(2)+'%';
 						}
+
 					}]);
 
 			/**
@@ -269,35 +224,28 @@ var routeCombo = new Ext.form.ComboBox({
 			var store = new Ext.data.Store({
 						// 获取数据的方式
 						proxy : new Ext.data.HttpProxy({
-									url :'busruntime.do?reqCode=queryCompareBustime'
+									url :'busruntime.do?reqCode=queryoverspeed'
 								}),
 						// 数据读取器
 						reader : new Ext.data.JsonReader({
 							totalProperty : 'TOTALCOUNT', // 记录总数
 							root : 'ROOT' // Json中的列表数据根节点
 						}, [ {
-											name : 'routename'
+											name : 'routeid'
 										}, {
-											name : 'rundate'
-										}, {
-											name : 'week'
-										}, {
-											name : 'weather'
+											name : 'date'
 										},{
-											name : 'timeinterval'
+											name : 'time'
 										},{
 											name : 'productid'
 										}, {
-											name : 'triptime'
+											name : 'station'
 										},{
 											
-											name : 'avtime'
-										},{
-											
-											name : 'totaltime'
+											name : 'nowvalue'
 										}, {
 											
-											name : 'upordown'
+											name : 'overrate'
 										}])
 					});
 

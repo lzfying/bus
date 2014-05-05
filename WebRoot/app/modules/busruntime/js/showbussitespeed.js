@@ -1,5 +1,5 @@
 /**
- * 分线路单车周转时间验证表
+ * 站点间平均运行速度
  * 
  * @author lz
  * @since 2014-4-15
@@ -138,8 +138,8 @@ var routeCombo = new Ext.form.ComboBox({
 											fieldLabel : '', // 标签
 											name : 'timebank2', // name:后台根据此name属性取值
 											maxLength : 20, // 可输入的最大文本长度,不区分中英文字符
-											allowBlank : true,
 											hidden:true,
+											allowBlank : true,
 											anchor : '100%'// 宽度百分比
 										}]
 							}]
@@ -178,72 +178,40 @@ var routeCombo = new Ext.form.ComboBox({
 			// 定义列模型
 			var cm = new Ext.grid.ColumnModel([rownum, sm,   {
 						header : '线路',
-						dataIndex : 'routename',
+						dataIndex : 'route',
 						//hidden : true, // 隐藏列
 						sortable : true,
 						width : 50
 						// 列宽
 				}	, {
 						header : '日期',
-						dataIndex : 'rundate',
+						dataIndex : 'date',
 						sortable : true,
-						width : 60
-					}, {
-						header : '星期',
-						dataIndex : 'week',
-						width : 30,
-						renderer:function(value){
-							var weekDay = ["星期天", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
-							//alert("sss sd"+Ext.getCmp('datetime').value);
-							Ext.get('datetime'); 
-					        var dateStr = "2008-08-08 08:08:08";
-					        var myDate = new Date(Date.parse(dateStr.replace(/-/g, "/"))); 
-					        //alert(weekDay[myDate.getDay()]);
-							
-						}
+						width : 120
 					}, {
 						header : '天气',
 						width : 80,
+						hidden : true, // 隐藏列
 						dataIndex : 'weather'
 					}, {
 						header : '时段',
-						width : 150,
-						dataIndex : 'timeinterval',
+						width : 200,
+						dataIndex : 'timesection',
 						renderer:function(value){
+							//alert(Object.prototype.toString.apply(value));
 							value = value.replace("[","(");
 							return value;
 						}
 					},{
-						header : '车载机编号',
+						header : '实际平均速度(公里/小时)',
 						width : 150,
-						dataIndex : 'productid'
-					},  {
-						header : '周转时间实际值(小时)',
-						width : 150,
-						dataIndex : 'triptime',
-						renderer:function(value){
-							//alert("dddd "+value);
-							//alert(Object.prototype.toString.apply(value));
-							
-							return value.substring(0,5);
-						}
+						dataIndex : 'realspeed'
+						
 						
 					},{
-						header : '预测周转时间(分钟)',
+						header : '标准差(公里/小时)',
 						width : 150,
-						dataIndex : 'avtime',
-						renderer:function(value){
-							return value.toFixed(2);
-							
-						}
-					},{
-						header : '差值(分钟)',
-						width : 150,
-						dataIndex : 'totaltime',
-						renderer:function(value){
-							return value.toFixed(2);
-							
-						}
+						dataIndex : 'devspeed'
 					}, {
 						header : '上行／下行',
 						width : 150,
@@ -269,32 +237,25 @@ var routeCombo = new Ext.form.ComboBox({
 			var store = new Ext.data.Store({
 						// 获取数据的方式
 						proxy : new Ext.data.HttpProxy({
-									url :'busruntime.do?reqCode=queryCompareBustime'
+									url :'busruntime.do?reqCode=querysitespeed'
 								}),
 						// 数据读取器
 						reader : new Ext.data.JsonReader({
 							totalProperty : 'TOTALCOUNT', // 记录总数
 							root : 'ROOT' // Json中的列表数据根节点
 						}, [ {
-											name : 'routename'
+											name : 'route'
 										}, {
-											name : 'rundate'
-										}, {
-											name : 'week'
-										}, {
+											name : 'date'
+										},{
 											name : 'weather'
 										},{
-											name : 'timeinterval'
-										},{
-											name : 'productid'
+											name : 'timesection'
 										}, {
-											name : 'triptime'
+											name : 'realspeed'
 										},{
 											
-											name : 'avtime'
-										},{
-											
-											name : 'totaltime'
+											name : 'devspeed'
 										}, {
 											
 											name : 'upordown'

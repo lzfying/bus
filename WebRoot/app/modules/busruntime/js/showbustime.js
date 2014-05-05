@@ -7,6 +7,31 @@
 Ext.onReady(function() {
 	
 	
+	var updownstore = new Ext.data.SimpleStore({
+		fields : ['name', 'code'],
+		data : [['下行', 'Down'], ['上行', 'Up']]
+	});
+	
+	var updownCombo= new Ext.form.ComboBox({
+		id : 'updown',
+		hiddenName : 'updown_name',
+		fieldLabel : '上行/下行',
+		emptyText : '请选择',
+		triggerAction : 'all',
+		store : updownstore,
+		displayField : 'name',
+		valueField : 'code',
+		mode : 'local',
+		forceSelection : false, // 选中内容必须为下拉列表的子项
+		editable : false,
+		typeAhead : true,
+		allowBlank : false,
+		// value:'0002',
+		resizable : true,
+		anchor : '95%'
+	});
+	
+	
 	var companyStore = new Ext.data.Store({
 		proxy : new Ext.data.HttpProxy({
 					url : 'busruntime.do?reqCode=queryCompanyDatas'
@@ -69,7 +94,7 @@ var routeCombo = new Ext.form.ComboBox({
 	triggerAction : 'all',
 	store : routeStore,
 	displayField : 'text',
-	valueField : 'value',
+	valueField : 'text',
 	loadingText : '正在加载数据...',
 	mode : 'local', // 数据会自动读取,如果设置为local又调用了store.load()则会读取2次；也可以将其设置为local，然后通过store.load()方法来读取
 	forceSelection : true,
@@ -109,15 +134,7 @@ var routeCombo = new Ext.form.ComboBox({
 								labelWidth : 60, // 标签宽度
 								defaultType : 'textfield',
 								border : false,
-								items : [{
-									fieldLabel : '时段从',
-									name : 'timebank1',
-									xtype : 'numberfield', // 设置为数字输入框类型
-									allowDecimals : false, // 是否允许输入小数
-									allowNegative : false, // 是否允许输入负数
-									maxValue : 120,
-									anchor : '100%'
-								},{
+								items : [updownCombo,{
 							        xtype : 'datefield',
 									fieldLabel : '日期', // 标签
 									id:'datetime',
@@ -134,10 +151,11 @@ var routeCombo = new Ext.form.ComboBox({
 								defaultType : 'textfield',
 								border : false,
 								items : [{
-											fieldLabel : '到', // 标签
+											fieldLabel : '', // 标签
 											name : 'timebank2', // name:后台根据此name属性取值
 											maxLength : 20, // 可输入的最大文本长度,不区分中英文字符
 											allowBlank : true,
+											hidden:true,
 											anchor : '100%'// 宽度百分比
 										}]
 							}]
@@ -202,7 +220,13 @@ var routeCombo = new Ext.form.ComboBox({
 					}, {
 						header : '天气',
 						width : 80,
-						dataIndex : 'weather'
+						dataIndex : 'weather',
+						renderer:function(value){
+							if(value=='1')
+								return '良好';
+							else (value=='0')
+								return '恶劣';
+						}
 					}, {
 						header : '时段',
 						width : 150,
@@ -216,6 +240,7 @@ var routeCombo = new Ext.form.ComboBox({
 						width : 150,
 						dataIndex : 'avtime',
 						renderer:function(value){
+							//alert(Object.prototype.toString.apply(value));
 							return value.toFixed(2);
 						}
 						
