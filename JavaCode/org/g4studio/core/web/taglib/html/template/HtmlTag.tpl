@@ -92,9 +92,9 @@ var explorer = '${userInfo.getExplorer()}';
 #if(${urlSecurity}=="1" && ${urlSecurity2}=="true")
 window.onload=function(){
   if(parent.userid != '${userInfo.getUserid()}'){
-     top.Ext.MessageBox.alert('提示', '这是一个非法请求或者您的会话连接由于在其它窗口上被注销而失效,系统将把您强制重定向到登录界面.', function() {
-		parent.window.location.href = webContext + '/login.do?reqCode=init';
-	 });
+    // top.Ext.MessageBox.alert('提示', '这是一个非法请求或者您的会话连接由于在其它窗口上被注销而失效,系统将把您强制重定向到登录界面.', function() {
+	//	parent.window.location.href = webContext + '/login.do?reqCode=init';
+	// });
   }
 };
 #end

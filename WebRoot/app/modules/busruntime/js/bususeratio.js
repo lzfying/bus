@@ -1,10 +1,11 @@
 /**
- * 分线路单车周转时间验证表
+ * 
  * 
  * @author lz
  * @since 2014-4-15
  */
 Ext.onReady(function() {
+	
 	
 	var updownstore = new Ext.data.SimpleStore({
 		fields : ['name', 'code'],
@@ -29,6 +30,8 @@ Ext.onReady(function() {
 		resizable : true,
 		anchor : '95%'
 	});
+	
+	
 	var companyStore = new Ext.data.Store({
 		proxy : new Ext.data.HttpProxy({
 					url : 'busruntime.do?reqCode=queryCompanyDatas'
@@ -124,14 +127,14 @@ var routeCombo = new Ext.form.ComboBox({
 								labelWidth : 60, // 标签宽度
 								defaultType : 'textfield',
 								border : false,
-								items : [companyCombo,routeCombo]
+								items : [companyCombo]
 							}, {
 								columnWidth : .33,
 								layout : 'form',
 								labelWidth : 60, // 标签宽度
 								defaultType : 'textfield',
 								border : false,
-								items : [updownCombo,{
+								items : [{
 							        xtype : 'datefield',
 									fieldLabel : '日期', // 标签
 									id:'datetime',
@@ -191,89 +194,20 @@ var routeCombo = new Ext.form.ComboBox({
 			// 定义列模型
 			var cm = new Ext.grid.ColumnModel([rownum, sm,   {
 						header : '线路',
-						dataIndex : 'routename',
+						dataIndex : 'route',
 						//hidden : true, // 隐藏列
 						sortable : true,
-						width : 50
+						width : 150
 						// 列宽
 				}	, {
 						header : '日期',
 						dataIndex : 'rundate',
 						sortable : true,
-						width : 60
+						width : 200
 					}, {
-						header : '星期',
-						dataIndex : 'week',
-						width : 30,
-						renderer:function(value){
-							var weekDay = ["星期天", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
-							//alert("sss sd"+Ext.getCmp('datetime').value);
-							Ext.get('datetime'); 
-					        var dateStr = "2008-08-08 08:08:08";
-					        var myDate = new Date(Date.parse(dateStr.replace(/-/g, "/"))); 
-					        //alert(weekDay[myDate.getDay()]);
-							
-						}
-					}, {
-						header : '天气',
-						width : 80,
-						dataIndex : 'weather'
-					}, {
-						header : '时段',
-						width : 150,
-						dataIndex : 'timeinterval',
-						renderer:function(value){
-							value = value.replace("[","(");
-							return value;
-						}
-					},{
-						header : '车载机编号',
-						width : 150,
-						dataIndex : 'productid'
-					},  {
-						header : '周转时间实际值(小时)',
-						width : 150,
-						dataIndex : 'triptime',
-						renderer:function(value){
-							//alert("dddd "+value);
-							//alert(Object.prototype.toString.apply(value));
-							
-							return value.substring(0,5);
-						}
-						
-					},{
-						header : '预测周转时间(分钟)',
-						width : 150,
-						dataIndex : 'avtime',
-						renderer:function(value){
-							return value.toFixed(2);
-							
-						}
-					},{
-						header : '差值(分钟)',
-						width : 150,
-						dataIndex : 'totaltime',
-						renderer:function(value){
-							return value.toFixed(2);
-							
-						}
-					}, {
-						header : '上行／下行',
-						width : 150,
-						dataIndex : 'upordown',
-						renderer:function(value){
-							if(value=="Up"){
-								return "上行";
-							}
-							else if(value=="Down"){
-								return "下行";
-							}
-							else {
-								return "none";
-								
-							}
-							
-						}
+						header : '使用次数',
+						dataIndex : 'usenum',
+						width : 130
 					}]);
 
 			/**
@@ -282,35 +216,15 @@ var routeCombo = new Ext.form.ComboBox({
 			var store = new Ext.data.Store({
 						// 获取数据的方式
 						proxy : new Ext.data.HttpProxy({
-									url :'busruntime.do?reqCode=queryCompareBustime'
+									url :'busspeed.do?reqCode=querybusUse'
 								}),
 						// 数据读取器
-						reader : new Ext.data.JsonReader({
-							totalProperty : 'TOTALCOUNT', // 记录总数
-							root : 'ROOT' // Json中的列表数据根节点
-						}, [ {
-											name : 'routename'
+						reader : new Ext.data.JsonReader({},[ {
+											name : 'route'
 										}, {
 											name : 'rundate'
 										}, {
-											name : 'week'
-										}, {
-											name : 'weather'
-										},{
-											name : 'timeinterval'
-										},{
-											name : 'productid'
-										}, {
-											name : 'triptime'
-										},{
-											
-											name : 'avtime'
-										},{
-											
-											name : 'totaltime'
-										}, {
-											
-											name : 'upordown'
+											name : 'usenum'
 										}])
 					});
 
@@ -318,51 +232,7 @@ var routeCombo = new Ext.form.ComboBox({
 			store.on('beforeload', function() {
 				this.baseParams = qForm.getForm().getValues();
 					});
-			// 每页显示条数下拉选择框
-			var pagesize_combo = new Ext.form.ComboBox({
-						name : 'pagesize',
-						triggerAction : 'all',
-						mode : 'local',
-						store : new Ext.data.ArrayStore({
-									fields : ['value', 'text'],
-									data : [[10, '10条/页'], [20, '20条/页'],
-											[50, '50条/页'], [100, '100条/页'],
-											[250, '250条/页'], [500, '500条/页']]
-								}),
-						valueField : 'value',
-						displayField : 'text',
-						value : '20',
-						editable : false,
-						width : 85
-					});
-			
-			
-			var number = parseInt(pagesize_combo.getValue());
-			// 改变每页显示条数reload数据
-			pagesize_combo.on("select", function(comboBox) {
-						bbar.pageSize = parseInt(comboBox.getValue());
-						number = parseInt(comboBox.getValue());
-						store.reload({
-									params : {
-										start : 0,
-										limit : bbar.pageSize
-									}
-								});
-					});
-			
-
-			// 分页工具栏
-			var bbar = new Ext.PagingToolbar({
-						pageSize : number,
-						store : store,
-						displayInfo : true,
-						displayMsg : '显示{0}条到{1}条,共{2}条',
-						plugins : new Ext.ux.ProgressBarPager(), // 分页进度条
-						emptyMsg : "没有符合条件的记录",
-						items : ['-', '&nbsp;&nbsp;', pagesize_combo]
-					});
-			
-			
+		
 			
 			// 表格右键菜单
 			var contextmenu = new Ext.menu.Menu({
@@ -404,7 +274,7 @@ var routeCombo = new Ext.form.ComboBox({
 						cm : cm, // 列模型
 						sm : sm, // 复选框
 			//			tbar : tbar, // 表格工具栏
-						bbar : bbar,// 分页工具栏
+			//			bbar : bbar,// 分页工具栏
 						viewConfig : {
 			// 不产横向生滚动条, 各列自动扩展自动压缩, 适用于列数比较少的情况
 						// forceFit : true
@@ -415,17 +285,132 @@ var routeCombo = new Ext.form.ComboBox({
 					});
 
 
-			
 			// 页面初始自动查询数据
 			// store.load({params : {start : 0,limit : bbar.pageSize}});
+			
+			grid.on('rowdblclick', function(grid, rowIndex, event) {
+				updateCatalogItem();
+			});
+			
+			function updateCatalogItem() {
+				var record = grid.getSelectionModel().getSelected();
+				if (Ext.isEmpty(record)) {
+					Ext.Msg.alert('提示:', '请先选中项目');
+					return;
+				}
+				
+				
+				
+				Ext.Ajax.request({
+					url : 'busspeed.do?reqCode=querybusUseRecord',
+					success : function(response) { // 回调函数有1个参数
+						var resultArray = Ext.util.JSON
+								.decode(response.responseText);
+						updateForm.getForm().loadRecord(resultArray);
+						//Ext.Msg.alert('提示', resultArray.msg);
+						
+					},
+					failure : function(response) {
+						Ext.MessageBox.alert('提示', '请求失败！');
+					},
+					params : {
+						route : record.data.route,
+						datetime:Ext.getCmp('datetime').value
+					}
+				});
+			
+				updateWindow.show(); // 显示窗口
+			}
+			var updateForm = new Ext.form.FormPanel({
+				collapsible : false,
+				border : true,
+				labelWidth : 60, // 标签宽度
+				// frame : true, //是否渲染表单面板背景色
+				labelAlign : 'right', // 标签对齐方式
+				bodyStyle : 'padding:5 5 0', // 表单元素和表单面板的边距
+				buttonAlign : 'center',
+				height : 250,
+				items : [ {
+					fieldLabel : '线路',
+					name : 'route',
+					xtype : 'textfield',
+					maxLength : 100,
+					emptyText : '',
+					anchor : '99%'
+				}, {
+					fieldLabel : '车载编号',
+					name : 'pids',
+					
+					xtype : 'textarea',
+					
+					emptyText : '',
+					anchor : '99%'
+				}]
+			});
 
+			
+			var updateWindow = new Ext.Window({
+				title : '<span class="commoncss">单线路车载机编号<span>', // 窗口标题
+				layout : 'fit', // 设置窗口布局模式
+				width : 600, // 窗口宽度
+				height : 260, // 窗口高度
+				closable : false, // 是否可关闭
+				collapsible : true, // 是否可收缩
+				maximizable : true, // 设置是否可以最大化
+				border : false, // 边框线设置
+				constrain : true, // 设置窗口是否可以溢出父容器
+				animateTarget : Ext.getBody(),
+				pageY : 20, // 页面定位Y坐标
+				pageX : document.body.clientWidth / 2 - 600 / 2, // 页面定位X坐标
+				items : [updateForm], // 嵌入的表单面板
+				buttons : [ {
+							text : '关闭',
+							iconCls : 'deleteIcon',
+							handler : function() {
+								updateWindow.hide();
+							}
+						}]
+			});
+
+			// 小画笔点击事件
+			grid.on("cellclick", function(pGrid, rowIndex, columnIndex, e) {
+						var store = pGrid.getStore();
+						var record = store.getAt(rowIndex);
+						var fieldName = pGrid.getColumnModel()
+								.getDataIndex(columnIndex);
+						// columnIndex为小画笔所在列的索引,缩阴从0开始
+						// 这里要非常注意!!!!!
+						if (fieldName == 'edit' && columnIndex == 2) {
+							var xmmc = record.get("xmmc");
+							// 到此你就可以继续做其他任何事情了
+							Ext.MessageBox.alert('提示', xmmc);
+						}
+					});
+
+			// 监听单元格双击事件
+			grid.on("celldblclick", function(pGrid, rowIndex, columnIndex, e) {
+				var record = pGrid.getStore().getAt(rowIndex);
+				var fieldName = pGrid.getColumnModel()
+						.getDataIndex(columnIndex);
+				var cellData = record.get(fieldName);
+					// Ext.MessageBox.alert('提示', cellData);
+				});
+
+			
+
+			// 给表格绑定右键菜单
+			grid.on("rowcontextmenu", function(grid, rowIndex, e) {
+						e.preventDefault(); // 拦截默认右键事件
+						grid.getSelectionModel().selectRow(rowIndex); // 选中当前行
+						contextmenu.showAt(e.getXY());
+					});
 
 			// 布局模型
 			var viewport = new Ext.Viewport({
 						layout : 'border',
 						items : [qForm, grid]
 					});
-			 
+
 			// 查询表格数据
 			function queryCatalogItem() {
 				store.load({
@@ -438,8 +423,8 @@ var routeCombo = new Ext.form.ComboBox({
 			// 查询表格数据
 			function queryBalanceInfo(pForm) {
 				var params = pForm.getValues();
-				params.start = 0;
-				params.limit = bbar.pageSize;
+				//params.start = 0;
+				//params.limit = bbar.pageSize;
 				store.load({
 							params : params
 						});

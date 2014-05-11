@@ -127,6 +127,8 @@
 		<action name="commonActionForm" path="/busruntime" scope="request"
 			parameter="reqCode"
 			type="org.bus.runtime.web.BusRunTimeAction">
+			<forward name="testchartsInitView" path="/app/modules/busruntime/hichart.jsp" />
+			
 			
 			<forward name="calculateTimeInitView" path="/app/modules/busruntime/showbustime.jsp" />
 			<forward name="compareTimeInitView" path="/app/modules/busruntime/compareshowbustime.jsp" />
@@ -136,6 +138,18 @@
 			<forward name="proveTimeInitView" path="/app/modules/busruntime/compareshowlinetime.jsp" />
 			<forward name="showbustimereportView" path="/app/modules/busruntime/showbustimereport.jsp" />
 			</action>
+			
+			
+			
+		<action name="commonActionForm" path="/busspeed" scope="request"
+			parameter="reqCode"
+			type="org.bus.runtime.web.BusSpeedAction">
+			<forward name="busUseInitInitView" path="/app/modules/busruntime/bususeratio.jsp" />
+			<forward name="bustourInitInitView" path="/app/modules/busruntime/bustour.jsp" />
+			
+			<forward name="querybustourReportInitView" path="/app/modules/busruntime/bustourreport.jsp" />
+			
+			</action>	
 			
 		<action name="commonActionForm" path="/mapshow" scope="request"
 			parameter="reqCode"

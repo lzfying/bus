@@ -285,7 +285,7 @@ var routeCombo = new Ext.form.ComboBox({
 							success : function(response, opts) {
 								var resultArray = Ext.util.JSON
 										.decode(response.responseText);
-								// Ext.Msg.alert('提示', resultArray.msg);
+								 Ext.Msg.alert('提示', response.responseText);
 								var xmlstring = resultArray.xmlstring;
 								updateChartXML('my2DcChart', xmlstring);
 							},

@@ -52,12 +52,12 @@ public class AjaxProxy extends HttpServlet{
 	
 	public String proxy1(HttpServletRequest req, HttpServletResponse resp) throws HttpException, IOException{
 		Enumeration paramNames = req.getParameterNames();
-	      StringBuffer bfParams = new StringBuffer("http://127.0.0.1:8084/Read_Data.aspx?");
+	      StringBuffer bfParams = new StringBuffer("http://127.0.0.1:8081/Read_Data.aspx?");
 	      //bfParams.append(req.getParameter("url")).append("?1=1");
 	      while(paramNames.hasMoreElements()) {
 	          String param = (String)paramNames.nextElement();
 	         
-	          bfParams.append(param).append("=").append( URLEncoder.encode(req.getParameter(param), "utf-8")).append("&");
+	          bfParams.append(param).append("=").append( req.getParameter(param)).append("&");
 	      }
 	      
 	        String url= bfParams.toString().substring(0, bfParams.toString().length()-1);

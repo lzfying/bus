@@ -1,34 +1,12 @@
 /**
- * 分线路单车周转时间验证表
+ * 线路班次查询
  * 
  * @author lz
  * @since 2014-4-15
  */
 Ext.onReady(function() {
 	
-	var updownstore = new Ext.data.SimpleStore({
-		fields : ['name', 'code'],
-		data : [['下行', 'Down'], ['上行', 'Up']]
-	});
 	
-	var updownCombo= new Ext.form.ComboBox({
-		id : 'updown',
-		hiddenName : 'updown_name',
-		fieldLabel : '上行/下行',
-		emptyText : '请选择',
-		triggerAction : 'all',
-		store : updownstore,
-		displayField : 'name',
-		valueField : 'code',
-		mode : 'local',
-		forceSelection : false, // 选中内容必须为下拉列表的子项
-		editable : false,
-		typeAhead : true,
-		allowBlank : false,
-		// value:'0002',
-		resizable : true,
-		anchor : '95%'
-	});
 	var companyStore = new Ext.data.Store({
 		proxy : new Ext.data.HttpProxy({
 					url : 'busruntime.do?reqCode=queryCompanyDatas'
@@ -86,6 +64,7 @@ var routeStore = new Ext.data.Store({
 
 var routeCombo = new Ext.form.ComboBox({
 	hiddenName : 'selectroute',
+	id : 'idselectroute',
 	fieldLabel : '线路',
 	emptyText : '请选择线路...',
 	triggerAction : 'all',
@@ -131,7 +110,17 @@ var routeCombo = new Ext.form.ComboBox({
 								labelWidth : 60, // 标签宽度
 								defaultType : 'textfield',
 								border : false,
-								items : [updownCombo,{
+								items : [{
+									fieldLabel : '',
+									name : 'timebank1',
+									xtype : 'numberfield', // 设置为数字输入框类型
+									allowDecimals : false, // 是否允许输入小数
+									allowNegative : false, // 是否允许输入负数
+									hidden:true,
+									maxValue : 120,
+									//value:new Date().add(Date.DAY, -7),
+									anchor : '100%'
+								},{
 							        xtype : 'datefield',
 									fieldLabel : '日期', // 标签
 									id:'datetime',
@@ -151,8 +140,8 @@ var routeCombo = new Ext.form.ComboBox({
 											fieldLabel : '', // 标签
 											name : 'timebank2', // name:后台根据此name属性取值
 											maxLength : 20, // 可输入的最大文本长度,不区分中英文字符
-											allowBlank : true,
 											hidden:true,
+											allowBlank : true,
 											anchor : '100%'// 宽度百分比
 										}]
 							}]
@@ -167,6 +156,31 @@ var routeCombo = new Ext.form.ComboBox({
 						queryBalanceInfo(qForm.getForm());
 					}
 				}, {
+					text : '上行统计报表',
+					iconCls : 'previewIcon',
+					handler : function() {
+						if (!qForm.form.isValid()) {
+							return;
+						}
+						
+						window1.show();
+					
+//						store.load({
+//									params : params
+//								});
+					}
+				},{
+					text : '下行统计报表',
+					iconCls : 'previewIcon',
+					handler : function() {
+						if (!qForm.form.isValid()) {
+							return;
+						}
+						var params = qForm.getForm().getValues();
+						window1.show();
+						updateChart('up');
+					}
+				},{
 					text : '重置',
 					iconCls : 'tbar_synchronizeIcon',
 					handler : function() {
@@ -191,89 +205,35 @@ var routeCombo = new Ext.form.ComboBox({
 			// 定义列模型
 			var cm = new Ext.grid.ColumnModel([rownum, sm,   {
 						header : '线路',
-						dataIndex : 'routename',
+						dataIndex : 'routeid',
 						//hidden : true, // 隐藏列
 						sortable : true,
 						width : 50
 						// 列宽
 				}	, {
 						header : '日期',
-						dataIndex : 'rundate',
+						dataIndex : 'date',
 						sortable : true,
-						width : 60
-					}, {
-						header : '星期',
-						dataIndex : 'week',
-						width : 30,
-						renderer:function(value){
-							var weekDay = ["星期天", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
-							//alert("sss sd"+Ext.getCmp('datetime').value);
-							Ext.get('datetime'); 
-					        var dateStr = "2008-08-08 08:08:08";
-					        var myDate = new Date(Date.parse(dateStr.replace(/-/g, "/"))); 
-					        //alert(weekDay[myDate.getDay()]);
-							
-						}
-					}, {
-						header : '天气',
-						width : 80,
-						dataIndex : 'weather'
-					}, {
-						header : '时段',
-						width : 150,
-						dataIndex : 'timeinterval',
-						renderer:function(value){
-							value = value.replace("[","(");
-							return value;
-						}
+						width : 120
+					},  {
+						header : '上下行',
+						width : 200,
+						dataIndex : 'upordown'
 					},{
 						header : '车载机编号',
 						width : 150,
 						dataIndex : 'productid'
-					},  {
-						header : '周转时间实际值(小时)',
-						width : 150,
-						dataIndex : 'triptime',
-						renderer:function(value){
-							//alert("dddd "+value);
-							//alert(Object.prototype.toString.apply(value));
-							
-							return value.substring(0,5);
-						}
 						
-					},{
-						header : '预测周转时间(分钟)',
-						width : 150,
-						dataIndex : 'avtime',
-						renderer:function(value){
-							return value.toFixed(2);
-							
-						}
-					},{
-						header : '差值(分钟)',
-						width : 150,
-						dataIndex : 'totaltime',
-						renderer:function(value){
-							return value.toFixed(2);
-							
-						}
+						
 					}, {
-						header : '上行／下行',
+						header : '实际开始站点序号',
 						width : 150,
-						dataIndex : 'upordown',
-						renderer:function(value){
-							if(value=="Up"){
-								return "上行";
-							}
-							else if(value=="Down"){
-								return "下行";
-							}
-							else {
-								return "none";
-								
-							}
-							
-						}
+						dataIndex : 'stationnum'
+					},{
+						header : '实际开始站点时间',
+						width : 150,
+						dataIndex : 'time'
+
 					}]);
 
 			/**
@@ -282,35 +242,26 @@ var routeCombo = new Ext.form.ComboBox({
 			var store = new Ext.data.Store({
 						// 获取数据的方式
 						proxy : new Ext.data.HttpProxy({
-									url :'busruntime.do?reqCode=queryCompareBustime'
+									url :'busspeed.do?reqCode=querybustour'
 								}),
 						// 数据读取器
 						reader : new Ext.data.JsonReader({
 							totalProperty : 'TOTALCOUNT', // 记录总数
 							root : 'ROOT' // Json中的列表数据根节点
 						}, [ {
-											name : 'routename'
+											name : 'routeid'
 										}, {
-											name : 'rundate'
-										}, {
-											name : 'week'
-										}, {
-											name : 'weather'
+											name : 'date'
 										},{
-											name : 'timeinterval'
+											name : 'upordown'
 										},{
 											name : 'productid'
 										}, {
-											name : 'triptime'
-										},{
 											
-											name : 'avtime'
-										},{
-											
-											name : 'totaltime'
+											name : 'stationnum'
 										}, {
 											
-											name : 'upordown'
+											name : 'time'
 										}])
 					});
 
@@ -459,24 +410,73 @@ var routeCombo = new Ext.form.ComboBox({
 				// 获得选中数据后则可以传入后台继续处理
 			}
 
-			// 演示render的用法
-			function colorRender(value, cellMetaData, record) {
-				// alert(record.data.xmid); 可以获取到Record对象哦
-				if (value == '盒') {
-					return "<span style='color:red; font-weight:bold'>" + value
-							+ "</span>";
-				}
-				if (value == '瓶') {
-					return "<span style='color:green; font-weight:bold'>"
-							+ value + "</span>";
-				}
-				return value;
-			}
 
 			// 生成一个图标列
 			function iconColumnRender(value) {
 				return "<a href='javascript:void(0);'><img src='" + webContext
 						+ "/resource/image/ext/edit1.png'/></a>";;
 			}
+			
+			
+			var panel1 = new Ext.Panel({
+		        contentEl:'myLineChart_div'
+		        });
+		     
+				var window1 = new Ext.Window({
+					layout : 'fit',
+					width : 570,
+					height : 390,
+					resizable : false,
+					draggable : true,
+					closable : true, // 是否可关闭
+					closeAction : 'hide', // 关闭策略
+					title : '<span class="commoncss">上行班次统计</span>',
+					collapsible : true,
+					titleCollapse : false,
+					//下拉层的动画效果必须关闭,否则将出现Flash图标下拉动画过场异常的现象
+					animCollapse : false,
+					maximizable : true,
+					border : false,
+					html: "<iframe src='busspeed.do?reqCode=querybustourReport' style='width:100%; height:100%;'></iframe>",
+					animateTarget : Ext.getBody(),
+					constrain : true
+				});
+				
+				
+
+		    // window.show();
+			
+//				window1.show();
+//
+//			     window1.on('show',function(){
+//			         setTimeout(function(){
+//			        	 updateChart('2');
+//			             },500)
+//			         });
+				function updateChart(upordown) {
+						
+						Ext.Ajax.request({
+									url : 'busspeed.do?reqCode=querybustourReport',
+									success : function(response, opts) {
+										var resultArray = Ext.util.JSON
+												.decode(response.responseText);
+										 Ext.Msg.alert('提示', response.responseText);
+										var xmlstring = resultArray.xmlstring;
+										updateChartXML('myLineChart', xmlstring);
+									},
+									failure : function(response, opts) {
+										Ext.MessageBox.alert('提示', '获取报表数据失败');
+									},
+									params : {
+										//params : params,
+										selectroute : Ext.getCmp('idselectroute').value,
+										updown_name:upordown,
+										datetime : Ext.getCmp('datetime').value
+									}
+								});
+					}
+
+			
+			
 
 		});
