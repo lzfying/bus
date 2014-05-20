@@ -148,16 +148,32 @@
 			<forward name="bustourInitInitView" path="/app/modules/busruntime/bustour.jsp" />
 			
 			<forward name="querybustourReportInitView" path="/app/modules/busruntime/bustourreport.jsp" />
+			<forward name="routespeedInitView" path="/app/modules/busruntime/showroutespeed.jsp" />
+			
+			<forward name="topspeedInitView" path="/app/modules/busruntime/topspeed.jsp" />
 			
 			</action>	
 			
 		<action name="commonActionForm" path="/mapshow" scope="request"
 			parameter="reqCode"
-			type="org.bus.runtime.web.BusRunTimeAction">
-			
+			type="org.bus.mapshow.web.MapShowAction">
 			<forward name="routeshowBymapView" path="/app/MapJiNanv2/index_1.jsp" />
 			<forward name="compareTimeInitView" path="/app/modules/busruntime/compareshowbustime.jsp" />
 			<forward name="proveTimeInitView" path="/app/modules/busruntime/compareshowlinetime.jsp" />
+			<forward name="showMapInitView" path="/app/modules/mapshow/showroutemap.jsp" />
+			<forward name="showMapStationInitView" path="/app/modules/mapshow/showstationmap.jsp" />
+			<forward name="showSpeedMapInitView" path="/app/modules/mapshow/showspeedmap.jsp" />
+		</action>
+	
+	
+	<action name="commonActionForm" path="/map" scope="request"
+			parameter="reqCode"
+			type="org.bus.runtime.web.BusMapAction">
+			
+			<forward name="busRouteMapInitView" path="/app/map/index.jsp" />
+			
+			<forward name="busSiteSpeedMapInitView" path="/app/map/selectPassenger.jsp" />
+			<forward name="buskeliuMapInitView" path="/app/map/statistics.jsp" />
 			</action>	
 	</action-mappings>
 

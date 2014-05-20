@@ -484,4 +484,196 @@ left join (
 
 
 	</select>
+	
+	
+	<select id="queryRouteMap" parameterClass="map" resultClass="dto">
+		SELECT route_id, baidu_lng as lng, baidu_lat as lat, lanscount, buslane,sxx  
+		FROM route_chouxi_view t where baidu_lat is not null
+		<dynamic >
+			
+			<isNotEmpty prepend="and" property="route_id">
+				t.route_id = #route_id#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="sxx">
+				t.sxx = #sxx#
+			</isNotEmpty>
+		</dynamic>
+		order by t.id,t.detail_id
+	</select>
+	
+	<select id="queryRouteStation" parameterClass="map" resultClass="dto">
+		SELECT station_name as name, baidu_lng as lng, baidu_lat as lat, station_len as len, sjcc, station_type,station_station_dis as ssd
+		FROM route_station_view t where baidu_lat is not null
+		<dynamic >
+			
+			<isNotEmpty prepend="and" property="route_id">
+				t.route_id = #route_id#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="sxx">
+				t.sxx = #sxx#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<select id="queryRouteImg" parameterClass="map" resultClass="dto">
+		SELECT route_id, baidu_lng as lng, baidu_lat as lat, pic_id, lanscount
+		FROM route_chouxi_view t where baidu_lat is not null
+		<dynamic >
+			
+			<isNotEmpty prepend="and" property="route_id">
+				t.route_id = #route_id#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="lng">
+				t.baidu_lng = #lng#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="lat">
+				t.baidu_lat = #lat#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="sxx">
+				t.sxx = #sxx#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<select id="queryStationMap" parameterClass="map" resultClass="dto">
+		SELECT station_name as name,baidu_lng as lng, baidu_lat as lat,sjcc,route_count as cars,ggw,
+		station_stype_name,station_width as wid,station_len as len,station_type as type,station_pos as pos
+		FROM station_view t 
+		<dynamic >
+			
+			<isNotEmpty prepend="where t.station_name like " property="station_name">
+				'%$station_name$%'
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	
+	<select id="querySpeedMap" parameterClass="map" resultClass="dto">
+		SELECT position as pos, positionPro as posp, realspeed 
+		FROM tb_station_speed_new t where t.realspeed>0 
+		<dynamic  >
+			
+			<isNotEmpty prepend="and" property="timesection">
+				t.timesection = #timesection#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="date">
+				t.date = #date#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<select id="queryRoad" parameterClass="map" resultClass="dto">
+		SELECT route_master_id as ri,id_road_detail_id as ii
+		FROM route_station_copy t where
+		<dynamic >
+			<isNotEmpty prepend="" property="pos">
+				t.phy_station_id = #pos#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="posp">
+				t.phy_station_pro = #posp#
+			</isNotEmpty>
+			limit 0,1
+		</dynamic>
+	</select>
+	
+	<select id="queryRoad2" parameterClass="map" resultClass="dto">
+		SELECT sxx,route_master_id as ri,id_road_detail_id as ii
+		FROM route_station_copy t where
+		<dynamic >
+			<isNotEmpty prepend="" property="posp">
+				t.phy_station_id = #posp#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="route_master_id">
+				t.route_master_id = #route_master_id#
+			</isNotEmpty>
+			limit 0,1
+		</dynamic>
+	</select>
+	
+	<select id="queryRouteSpeedMap" parameterClass="map" resultClass="dto">
+		SELECT baidu_lng as lng, baidu_lat as lat,#color# as color
+		FROM route_chouxi_view t where baidu_lat is not null
+		<dynamic >
+			
+			<isNotEmpty prepend="and" property="route_id">
+				t.route_id = #route_id#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="sxx">
+				t.sxx = #sxx#
+			</isNotEmpty>
+			<isNotEmpty prepend="and ( id between " property="id1">
+				#id1#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="id2">
+				#id2#)
+			</isNotEmpty>
+		</dynamic>
+		order by t.id,t.detail_id
+	</select>
+	
+	<select id="queryroutespeed" parameterClass="map" resultClass="dto">
+		  
+	select * from (
+
+	SELECT t.TimeSection,t.UporDown,t.TimeInterval,t.ROUTEID ,t.data_cft,t.Startdate as rundate,
+
+	avg(t.Speed) as avspeed
+
+FROM bus.tb_triptime12 t where  t.Speed>0 
+<dynamic >
+			
+			<isNotEmpty prepend="and" property="datetime">
+				t.Startdate = #datetime#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="selectroute">
+				t.routeid = #selectroute#
+			</isNotEmpty>
+		</dynamic>
+
+group by t.ROUTEID  ,t.TimeInterval order by t.TimeInterval )a
+
+left join  (select b.SpeedAVG as standspeed,b.Type,b.TimeInterval,b.ROUTEID from tb_tripspeedavg b ) c on a.data_cft = c.Type and a.TimeInterval = c.TimeInterval 
+and a.ROUTEID = c.routeid order by a.TimeInterval
+		
+	</select>
+	
+	
+	
+	
+		<select id="queryroutespeedtop" parameterClass="map" resultClass="dto">
+		  
+		SELECT avg(t.speed) as topspeed ,t.ROUTEID,t.UporDown,t.Startdate FROM bus.tb_triptime12 t where 
+		
+		<![CDATA[
+				 t.TimeInterval >#timeinterval1#  and t.TimeInterval <#timeinterval2# 
+ 				]]>
+ 			and t.speed >0 
+		<dynamic >
+			
+			<isNotEmpty prepend="and" property="datetime">
+				t.Startdate = #datetime#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="UporDown">
+				t.UporDown = #UporDown#
+			</isNotEmpty>
+		</dynamic>
+
+		group by t.routeid  order by topspeed desc  LIMIT 10;
+		
+	</select>
+	
+	
+	
+	<select id="addtimearea" parameterClass="map" resultClass="dto">
+		  
+		SELECT time_format(t.StartTime,'%H.%i.%s') as time,t.RowID as id FROM meta_site_route t 
+		where t.StartTime >STR_TO_DATE('2012-03-26 06:41:57','%Y-%m-%d %H:%i:%s') order by time asc
+		
+	</select>
+	
+	<update id="updateByjsb" parameterClass="map">
+		UPDATE meta_site_route SET TimeInterval = #timeinterval# WHERE rowid = #id#
+	</update>
+	
+	
 </sqlMap>

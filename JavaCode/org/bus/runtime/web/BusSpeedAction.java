@@ -1,6 +1,7 @@
 package org.bus.runtime.web;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -55,6 +56,38 @@ public class BusSpeedAction extends BizAction {
 			HttpServletResponse response) throws Exception {
 		
 		return mapping.findForward("bustourInitInitView");
+	}
+	
+	/**
+	 * 线路速度排序初始化
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward topspeedInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		
+		return mapping.findForward("topspeedInitView");
+	}
+	
+	/**
+	 * 线路速度统计初始化
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward routespeedInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		
+		return mapping.findForward("routespeedInitView");
 	}
 	
 	
@@ -152,7 +185,7 @@ public class BusSpeedAction extends BizAction {
 	}
 	
 	
-	public ActionForward querybustourReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	public ActionForward querybustourReportbak(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
 		
 		CommonActionForm aForm = (CommonActionForm) form;
@@ -246,6 +279,95 @@ public class BusSpeedAction extends BizAction {
 	
 	
 	
+	public ActionForward querybustourReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		
+		CommonActionForm aForm = (CommonActionForm) form;
+		Dto dto = aForm.getParamAsDto(request);
+		String selectroute = dto.getAsString("selectroute");
+		//String updown_name = dto.getAsString("updown_name").equals("Down")?"下行":"上行";
+		dto.put("upordown", "1");
+		List list =g4Reader.queryForList("Bus.querybustourReport", dto);
+		dto.put("upordown", "3");
+		List list1 =g4Reader.queryForList("Bus.querybustourReport", dto);
+
+		
+		String restr1= getStringDataFromList(list);
+		String restr2= getStringDataFromList(list1);
+		
+		super.write(restr1+"*"+restr2, response);
+		return mapping.findForward("querybustourReportInitView");
+	}
+	
+	
+	public ActionForward queryspeedtop(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		
+		CommonActionForm aForm = (CommonActionForm) form;
+		Dto dto = aForm.getParamAsDto(request);
+		String timearea = dto.getAsString("updown_name");
+		
+		String timeinterval1 = "";
+		String timeinterval2 = "";
+		
+		if(timearea.equals("1")){
+			timeinterval1="3";
+			timeinterval2="8";
+			
+		}else if(timearea.equals("2")){
+			timeinterval1="9";
+			timeinterval2="23";
+			
+		}else{
+			
+			timeinterval1="23";
+			timeinterval2="28";
+		}
+		
+		
+		dto.put("timeinterval1", timeinterval1);
+		dto.put("timeinterval2", timeinterval2);
+		//String updown_name = dto.getAsString("updown_name").equals("Down")?"下行":"上行";
+		dto.put("UporDown", "Down");
+		List list =g4Reader.queryForList("Bus.queryroutespeedtop", dto);
+		dto.put("UporDown", "Up");
+		List list1 =g4Reader.queryForList("Bus.queryroutespeedtop", dto);
+
+		list.addAll(list1);
+		
+		Collections.sort(list,new TopSpeedComparetor());
+		List re = list.subList(0, 9);
+		String jsonString = JsonHelper.encodeObject2Json(list, G4Constants.FORMAT_Date);
+		super.write(jsonString, response);
+		return mapping.findForward("querybustourReportInitView");
+	}
+	
+	
+	
+	
+	public String getStringDataFromList(List list){
+		String re="";String re1="";
+		int total=0;
+		for(int i=0;i<list.size();i++){
+			
+			Dto d = (Dto) list.get(i);
+			String hour= d.getAsString("hour");
+			String num= d.getAsString("num");
+			total=total+ d.getAsInteger("num");
+			re=re+hour+","+num+"|";
+			
+			re1=re1+hour+","+total+"|";
+		}
+		
+		if(re!=null&&!re.equals("")){
+			re = re.substring(0, re.length()-1);
+			re1 = re1.substring(0, re1.length()-1);
+			
+		}
+		return re+"*"+re1;
+	}
+	
+	
 	/**
 	 * 获取班次统计的元数据 (折线组合图)
 	 * @param pDto
@@ -287,5 +409,51 @@ public class BusSpeedAction extends BizAction {
 	}
 	
 	
+	public ActionForward queryroutespeed(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		CommonActionForm aForm = (CommonActionForm) form;
+		Dto dto = aForm.getParamAsDto(request);
+		List areaList = g4Reader.queryForList("Bus.queryroutespeed", dto);
+		String jsonString = JsonHelper.encodeObject2Json(areaList,G4Constants.FORMAT_Date);
+		write(jsonString, response);
+		return mapping.findForward(null);
+	}
 	
+	public ActionForward queryroutespeedreport(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		CommonActionForm aForm = (CommonActionForm) form;
+		Dto dto = aForm.getParamAsDto(request);
+		List areaList = g4Reader.queryForList("Bus.queryroutespeed", dto);
+		
+		String re="";String re1="";
+		
+		for(int i=0;i<areaList.size();i++){
+			
+			Dto d = (Dto) areaList.get(i);
+			String time = d.getAsString("timeinterval");
+			
+			String speed = d.getAsString("standspeed");
+			if(speed.equals("")){
+				
+				speed="22";
+			}
+			speed=speed.substring(0, speed.indexOf("."));
+			String avspeed = d.getAsString("avspeed");
+			
+			if(avspeed.equals("")){
+				speed="25";
+				
+			}
+			avspeed=avspeed.substring(0, avspeed.indexOf("."));
+			//avspeed="20";
+			re=re+time+","+speed+"|";
+			re1=re1+time+","+avspeed+"|";
+			
+		}
+		
+		super.write(re+"*"+re1, response);
+		
+		
+		return mapping.findForward(null);
+	}
 }

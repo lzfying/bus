@@ -1,5 +1,5 @@
 /**
- * 线路班次查询
+ * 
  * 
  * @author lz
  * @since 2014-4-15
@@ -63,8 +63,8 @@ var routeStore = new Ext.data.Store({
 	});
 
 var routeCombo = new Ext.form.ComboBox({
+	id:'idselectroute',
 	hiddenName : 'selectroute',
-	id : 'idselectroute',
 	fieldLabel : '线路',
 	emptyText : '请选择线路...',
 	triggerAction : 'all',
@@ -118,7 +118,6 @@ var routeCombo = new Ext.form.ComboBox({
 									allowNegative : false, // 是否允许输入负数
 									hidden:true,
 									maxValue : 120,
-									//value:new Date().add(Date.DAY, -7),
 									anchor : '100%'
 								},{
 							        xtype : 'datefield',
@@ -127,7 +126,7 @@ var routeCombo = new Ext.form.ComboBox({
 									name : 'datetime', // name:后台根据此name属性取值 
 									format:'Y-m-d', //日期格式化
 									maxValue:'2014-12-31', //允许选择的最大日期
-									//minValue:'2014-05-01', //允许选择的最小日期
+									
 									anchor : '100%' // 宽度百分比
 								}]
 							}, {
@@ -140,8 +139,8 @@ var routeCombo = new Ext.form.ComboBox({
 											fieldLabel : '', // 标签
 											name : 'timebank2', // name:后台根据此name属性取值
 											maxLength : 20, // 可输入的最大文本长度,不区分中英文字符
-											hidden:true,
 											allowBlank : true,
+											hidden:true,
 											anchor : '100%'// 宽度百分比
 										}]
 							}]
@@ -178,7 +177,7 @@ var routeCombo = new Ext.form.ComboBox({
 						}
 						
 							Ext.Ajax.request({
-				                url: 'busspeed.do?reqCode=querybustourReport',
+				                url: 'busspeed.do?reqCode=queryroutespeedreport',
 				
 				              
 				                params: { selectroute: Ext.getCmp('idselectroute').value,
@@ -192,10 +191,7 @@ var routeCombo = new Ext.form.ComboBox({
 				                	var datastr2= new Array(); 
 				                	var str1= new Array(); 
 				                	var str2= new Array(); 
-				                	var datastr3= new Array(); 
-				                	var datastr4= new Array(); 
-				                	var str3= new Array(); 
-				                	var str4= new Array(); 
+				                	
 				                	var re= new Array(); 
 				                	re=response.responseText.split("*"); 
 				                	
@@ -223,34 +219,12 @@ var routeCombo = new Ext.form.ComboBox({
 				                	}
 				                	
 				                	
-				                	str3=re[2].split("|");
 				                	
-				                	
-				                	for(var i=0;i<str3.length;i++){
-				                		var array = new Array();
-				                		var tmp = new Array();
-				                		array=str3[i].split(",");
-				                		tmp[0]=parseFloat(array[0]);
-				                		tmp[1]=parseFloat(array[1]);
-				                		datastr3[i]=tmp;
-				                	}
-				                	
-				                	str4=re[3].split("|"); 
-				                	
-				                	for(var i=0;i<str4.length;i++){
-				                		var array = new Array();
-				                		var tmp = new Array();
-				                		array=str4[i].split(",");
-				                		tmp[0]=parseFloat(array[0]);
-				                		tmp[1]=parseFloat(array[1]);
-				                		datastr4[i]=tmp;
-				                	}
 				                	
 				                	
 				                	chart.series[0].setData(datastr1);  
 				                	chart.series[1].setData(datastr2);  
-				                	chart.series[2].setData(datastr3);  
-				                	chart.series[3].setData(datastr4);  
+				                	
 				                	
 				                  //  Ext.MessageBox.alert('成功', '从服务端获取结果: ' + response.responseText);
 				
@@ -263,10 +237,6 @@ var routeCombo = new Ext.form.ComboBox({
 				                }
 				
 				            });
-							
-							
-							
-							
 							
 					
 
@@ -303,36 +273,48 @@ var routeCombo = new Ext.form.ComboBox({
 						// 列宽
 				}	, {
 						header : '日期',
-						dataIndex : 'date',
+						dataIndex : 'rundate',
 						sortable : true,
-						width : 120
+						width :120
+					}, {
+						header : '时段',
+						width : 150,
+						dataIndex : 'timesection',
+						renderer:function(value){
+							value = value.replace("[","(");
+							return value;
+						}
 					},  {
-						header : '上下行',
-						width : 200,
+						header : '平均速度',
+						width : 150,
+						dataIndex : 'avspeed',
+						renderer:function(value){
+							//alert(Object.prototype.toString.apply(value));
+							return value.toFixed(2);
+						}
+						
+					},{
+						header : '标准速度',
+						width : 150,
+						dataIndex : 'standspeed'
+						
+					},{
+						header : '上行／下行',
+						width : 150,
 						dataIndex : 'upordown',
 						renderer:function(value){
-							if(value=='1')
-								return '上行';
-							else
-								return '下行';
-					        //alert(weekDay[myDate.getDay()]);
+							if(value=="Up"){
+								return "上行";
+							}
+							else if(value=="Down"){
+								return "下行";
+							}
+							else {
+								return "none";
+								
+							}
 							
 						}
-					},{
-						header : '车载机编号',
-						width : 150,
-						dataIndex : 'productid'
-						
-						
-					}, {
-						header : '实际开始站点序号',
-						width : 150,
-						dataIndex : 'stationnum'
-					},{
-						header : '实际开始站点时间',
-						width : 150,
-						dataIndex : 'time'
-
 					}]);
 
 			/**
@@ -341,26 +323,23 @@ var routeCombo = new Ext.form.ComboBox({
 			var store = new Ext.data.Store({
 						// 获取数据的方式
 						proxy : new Ext.data.HttpProxy({
-									url :'busspeed.do?reqCode=querybustour'
+									url :'busspeed.do?reqCode=queryroutespeed'
 								}),
 						// 数据读取器
-						reader : new Ext.data.JsonReader({
-							totalProperty : 'TOTALCOUNT', // 记录总数
-							root : 'ROOT' // Json中的列表数据根节点
-						}, [ {
+						reader : new Ext.data.JsonReader({},[ {
 											name : 'routeid'
 										}, {
-											name : 'date'
+											name : 'rundate'
+										}, {
+											name : 'timesection'
+										},  {
+											name : 'avspeed'
 										},{
+											
+											name : 'standspeed'
+										}, {
+											
 											name : 'upordown'
-										},{
-											name : 'productid'
-										}, {
-											
-											name : 'stationnum'
-										}, {
-											
-											name : 'time'
 										}])
 					});
 
@@ -368,50 +347,7 @@ var routeCombo = new Ext.form.ComboBox({
 			store.on('beforeload', function() {
 				this.baseParams = qForm.getForm().getValues();
 					});
-			// 每页显示条数下拉选择框
-			var pagesize_combo = new Ext.form.ComboBox({
-						name : 'pagesize',
-						triggerAction : 'all',
-						mode : 'local',
-						store : new Ext.data.ArrayStore({
-									fields : ['value', 'text'],
-									data : [[10, '10条/页'], [20, '20条/页'],
-											[50, '50条/页'], [100, '100条/页'],
-											[250, '250条/页'], [500, '500条/页']]
-								}),
-						valueField : 'value',
-						displayField : 'text',
-						value : '20',
-						editable : false,
-						width : 85
-					});
-			
-			
-			var number = parseInt(pagesize_combo.getValue());
-			// 改变每页显示条数reload数据
-			pagesize_combo.on("select", function(comboBox) {
-						bbar.pageSize = parseInt(comboBox.getValue());
-						number = parseInt(comboBox.getValue());
-						store.reload({
-									params : {
-										start : 0,
-										limit : bbar.pageSize
-									}
-								});
-					});
-			
 
-			// 分页工具栏
-			var bbar = new Ext.PagingToolbar({
-						pageSize : number,
-						store : store,
-						displayInfo : true,
-						displayMsg : '显示{0}条到{1}条,共{2}条',
-						plugins : new Ext.ux.ProgressBarPager(), // 分页进度条
-						emptyMsg : "没有符合条件的记录",
-						items : ['-', '&nbsp;&nbsp;', pagesize_combo]
-					});
-			
 			
 			
 			// 表格右键菜单
@@ -454,7 +390,7 @@ var routeCombo = new Ext.form.ComboBox({
 						cm : cm, // 列模型
 						sm : sm, // 复选框
 			//			tbar : tbar, // 表格工具栏
-						bbar : bbar,// 分页工具栏
+			//			bbar : bbar,// 分页工具栏
 						viewConfig : {
 			// 不产横向生滚动条, 各列自动扩展自动压缩, 适用于列数比较少的情况
 						// forceFit : true
@@ -465,17 +401,55 @@ var routeCombo = new Ext.form.ComboBox({
 					});
 
 
-			
 			// 页面初始自动查询数据
 			// store.load({params : {start : 0,limit : bbar.pageSize}});
 
+			// 小画笔点击事件
+			grid.on("cellclick", function(pGrid, rowIndex, columnIndex, e) {
+						var store = pGrid.getStore();
+						var record = store.getAt(rowIndex);
+						var fieldName = pGrid.getColumnModel()
+								.getDataIndex(columnIndex);
+						// columnIndex为小画笔所在列的索引,缩阴从0开始
+						// 这里要非常注意!!!!!
+						if (fieldName == 'edit' && columnIndex == 2) {
+							var xmmc = record.get("xmmc");
+							// 到此你就可以继续做其他任何事情了
+							Ext.MessageBox.alert('提示', xmmc);
+						}
+					});
+
+			// 监听单元格双击事件
+			grid.on("celldblclick", function(pGrid, rowIndex, columnIndex, e) {
+				var record = pGrid.getStore().getAt(rowIndex);
+				var fieldName = pGrid.getColumnModel()
+						.getDataIndex(columnIndex);
+				var cellData = record.get(fieldName);
+					// Ext.MessageBox.alert('提示', cellData);
+				});
+
+			// 监听行双击事件
+			grid.on('rowdblclick', function(pGrid, rowIndex, event) {
+						// 获取行数据集
+						var record = pGrid.getStore().getAt(rowIndex);
+						// 获取单元格数据集
+						var data = record.get("xmmc");
+						Ext.MessageBox.alert('提示', "双击行的索引为:" + rowIndex);
+					});
+
+			// 给表格绑定右键菜单
+			grid.on("rowcontextmenu", function(grid, rowIndex, e) {
+						e.preventDefault(); // 拦截默认右键事件
+						grid.getSelectionModel().selectRow(rowIndex); // 选中当前行
+						contextmenu.showAt(e.getXY());
+					});
 
 			// 布局模型
 			var viewport = new Ext.Viewport({
 						layout : 'border',
 						items : [qForm, grid]
 					});
-			 
+
 			// 查询表格数据
 			function queryCatalogItem() {
 				store.load({
@@ -488,8 +462,8 @@ var routeCombo = new Ext.form.ComboBox({
 			// 查询表格数据
 			function queryBalanceInfo(pForm) {
 				var params = pForm.getValues();
-				params.start = 0;
-				params.limit = bbar.pageSize;
+				//params.start = 0;
+				//params.limit = bbar.pageSize;
 				store.load({
 							params : params
 						});
@@ -510,15 +484,7 @@ var routeCombo = new Ext.form.ComboBox({
 			}
 
 
-			// 生成一个图标列
-			function iconColumnRender(value) {
-				return "<a href='javascript:void(0);'><img src='" + webContext
-						+ "/resource/image/ext/edit1.png'/></a>";;
-			}
-			
-			
-			
-			
+
 			
 			
 			
@@ -545,7 +511,7 @@ var routeCombo = new Ext.form.ComboBox({
 		                zoomType: 'xy'                                                                   
 		            },                                                                                   
 		            title: {                                                                             
-		                text: '班次统计'                        
+		                text: '线路速度'                        
 		            },                                                                                   
 		            subtitle: {                                                                          
 		                text: '济南公交智能指挥系统: bus  2014'                                                      
@@ -559,14 +525,12 @@ var routeCombo = new Ext.form.ComboBox({
 		                    text: '时间区间'                                                          
 		                } ,
 		                labels: {
-		                	formatter: function() {
-		                        return this.value +'点'
-		                    }
+		                	
 		                }                                                           
 		            },                                                                                   
 		            yAxis: {                                                                             
 		                title: {                                                                         
-		                    text: '周转时间 (分钟)'                                                          
+		                    text: '速度 '                                                          
 		                }                                                                                
 		            },                                                                                   
 		            legend: {                                                                            
@@ -602,47 +566,29 @@ var routeCombo = new Ext.form.ComboBox({
 		                    },                                                                           
 		                    tooltip: {                                                                   
 		                        headerFormat: '<b>{series.name}</b><br>',                                
-		                        pointFormat: '{point.x}  , {point.y} 分钟'                                
+		                        pointFormat: '{point.x}  , {point.y}ss '                                
 		                    }                                                                            
 		                }                                                                                
 		            },                                                                                   
 		            series: [{
 		                type: 'spline',
-		                name: '上行分时班次',
+		                name: '线路平均速度',
+		                data: [],
+		                marker: {
+		                	lineWidth: 2,
+		                	lineColor: Highcharts.getOptions().colors[1],
+		                	fillColor: 'red'
+		                }
+		            } ,{
+		                type: 'spline',
+		                name: '线路标准速度',
 		                data: [],
 		                marker: {
 		                	lineWidth: 2,
 		                	lineColor: Highcharts.getOptions().colors[3],
 		                	fillColor: 'white'
 		                }
-		            } ,{
-		                type: 'spline',
-		                name: '上行累计班次',
-		                data: [],
-		                marker: {
-		                	lineWidth: 2,
-		                	lineColor: Highcharts.getOptions().colors[3],
-		                	fillColor: 'white'
-		                }
-		            },{
-		                type: 'spline',
-		                name: '下行分时班次',
-		                data: [],
-		                marker: {
-		                	lineWidth: 2,
-		                	lineColor: Highcharts.getOptions().colors[1],
-		                	fillColor: 'white'
-		                }
-		            } ,{
-		                type: 'spline',
-		                name: '下行累计班次',
-		                data: [],
-		                marker: {
-		                	lineWidth: 2,
-		                	lineColor: Highcharts.getOptions().colors[1],
-		                	fillColor: 'white'
-		                }
-		            } ]                                                                                   
+		            }]                                                                                   
 		        
 		        	
 		        });
@@ -679,7 +625,7 @@ var routeCombo = new Ext.form.ComboBox({
 					draggable : true,
 					closable : true, // 是否可关闭
 					closeAction : 'hide', // 关闭策略
-					title : '<span class="commoncss">上行班次统计</span>',
+					title : '<span class="commoncss">线路速度</span>',
 					collapsible : true,
 					titleCollapse : false,
 					//下拉层的动画效果必须关闭,否则将出现Flash图标下拉动画过场异常的现象
@@ -692,16 +638,6 @@ var routeCombo = new Ext.form.ComboBox({
 				});
 				
 				window1.hide();
-
-	 //    window1.show();
-			
-//				window1.show();
-//
-//			     window1.on('show',function(){
-//			         setTimeout(function(){
-//			        	 updateChart('2');
-//			             },500)
-//			         });
 
 			
 			

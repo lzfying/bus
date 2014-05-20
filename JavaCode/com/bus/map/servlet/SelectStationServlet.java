@@ -2,6 +2,7 @@ package com.bus.map.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URLEncoder;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -12,6 +13,12 @@ import javax.servlet.http.HttpServletResponse;
 import com.bus.map.connection.ConnectionMySql;
 import com.bus.po.Station;
 
+/**
+ * 公交站点查询
+ * @author jsl
+ * DATE:2014-05-08
+ *
+ */
 public class SelectStationServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
@@ -29,6 +36,7 @@ public class SelectStationServlet extends HttpServlet {
 		PrintWriter out = response.getWriter();
 		
 		String select_name=request.getParameter("select_name");
+		//select_name=URLEncoder.encode(select_name,"GB2312");
 		ConnectionMySql conn=new ConnectionMySql();
 		List<Station> list_sta=conn.getStation_List(select_name);
 		String restr="";
