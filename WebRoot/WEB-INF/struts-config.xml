@@ -137,6 +137,17 @@
 			<forward name="showbusoverspeedreportInitView" path="/app/modules/busruntime/showbusoverspeedreport.jsp" />
 			<forward name="proveTimeInitView" path="/app/modules/busruntime/compareshowlinetime.jsp" />
 			<forward name="showbustimereportView" path="/app/modules/busruntime/showbustimereport.jsp" />
+			
+		
+			
+			
+			<forward name="busSpaceTestInitView" path="/app/modules/busruntime/busspacetest.jsp" />
+			<forward name="busPeakSpaceTestInitView" path="/app/modules/busruntime/buspeakspacetest.jsp" />
+			<forward name="busCompletionPeakInitView" path="/app/modules/busruntime/buscompletionpeak.jsp" />
+			<forward name="busCompletionDayInitView" path="/app/modules/busruntime/buscompletionday.jsp" />
+			<forward name="busPeakInitView" path="/app/modules/busruntime/buspeak.jsp" />
+			<forward name="busChuanInitView" path="/app/modules/busruntime/buschuan.jsp" />
+			<forward name="busSectionRunsInitView" path="/app/modules/busruntime/bussectionrun.jsp" />
 			</action>
 			
 			
@@ -151,7 +162,13 @@
 			<forward name="routespeedInitView" path="/app/modules/busruntime/showroutespeed.jsp" />
 			
 			<forward name="topspeedInitView" path="/app/modules/busruntime/topspeed.jsp" />
+			<forward name="stoptimeInitView" path="/app/modules/busruntime/stoptime.jsp" />
 			
+			<forward name="roadblockedInitView" path="/app/modules/abnormal/roadblocked.jsp" />
+			
+			<forward name="commonroadblockedInitView" path="/app/modules/abnormal/commonroadblocked.jsp" />
+			
+			<forward name="bancijiangeInitView" path="/app/modules/abnormal/jiange.jsp" />
 			</action>	
 			
 		<action name="commonActionForm" path="/mapshow" scope="request"

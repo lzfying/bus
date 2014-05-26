@@ -503,6 +503,39 @@ public class BusRunTimeAction extends BizAction {
 	}
 	
 	
+	public ActionForward queryroutetimeDatas(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		CommonActionForm aForm = (CommonActionForm) form;
+		Dto dto = aForm.getParamAsDto(request);
+		String da= dto.getAsString("datetime");
+		String[] ee = new String[3];
+		ee=da.split("-");
+		dto.put("datetime", ee[0]+"-"+ee[1]+"-1");
+		List areaList = g4Reader.queryForList("Bus.queryroutetimeDatas", dto);
+		Dto andone = new BaseDto();
+		String tmp ="";
+		for(int i=0;i<areaList.size();i++){
+			
+			Dto re = (Dto) areaList.get(i);
+			re.put("value", i);
+			andone.put("route", re.getAsString("route"));
+			if(re.getAsString("c").equals("1")){
+				tmp=re.getAsString("m_end");
+			}else if(re.getAsString("c").equals("2")){
+				tmp=tmp+"-"+re.getAsString("m_end");
+				
+			}
+			
+		}
+		andone.put("timearea", tmp);
+		areaList.add(andone);
+		
+		String jsonString = JsonHelper.encodeObject2Json(areaList);
+		write(jsonString, response);
+		return mapping.findForward(null);
+	}
+	
+	
 	public static boolean isNumeric(String str){
 		  for (int i = str.length();--i>=0;){   
 		   if (!Character.isDigit(str.charAt(i))){
@@ -749,4 +782,479 @@ public class BusRunTimeAction extends BizAction {
 		write(JsonHelper.encodeObject2Json(outDto), response);
 		return mapping.findForward(null);
 	}
+	
+	
+	
+	
+	
+	
+	
+	/**
+	 * 断面通过车次
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward busSectionRunsInit(ActionMapping mapping,
+			ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		return mapping.findForward("busSectionRunsInitView");
+	}
+
+	/**
+	 * 线路运行大间隔识别与统计
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward busPeakInit(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		return mapping.findForward("busPeakInitView");
+	}
+
+	/**
+	 * 串车发现
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward busChuanInit(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		return mapping.findForward("busChuanInitView");
+	}
+
+	/**
+	 * 全天班次完成率
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward busCompletionDayInit(ActionMapping mapping,
+			ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		return mapping.findForward("busCompletionDayInitView");
+	}
+
+	/**
+	 * 高峰班次完成率
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward busCompletionPeakInit(ActionMapping mapping,
+			ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		return mapping.findForward("busCompletionPeakInitView");
+	}
+
+	/**
+	 * 平峰间隔验证
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward busSpaceTestInit(ActionMapping mapping,
+			ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		return mapping.findForward("busSpaceTestInitView");
+	}
+
+	/**
+	 * 高峰间隔验证
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward busPeakSpaceTestInit(ActionMapping mapping,
+			ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		return mapping.findForward("busPeakSpaceTestInitView");
+	}
+	
+	
+	
+	
+	/**
+	 * 高峰班次执行情况查询
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward queryBusCompletionPeak(ActionMapping mapping,
+			ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		CommonActionForm aForm = (CommonActionForm) form;
+		Dto dto = aForm.getParamAsDto(request);
+
+		List routeList = g4Reader.queryForList("Bus.queryRouteByCompany", dto);
+		List list = new ArrayList();
+		for (int r = 0; r < routeList.size(); r++) {
+			Dto dtor = (BaseDto) routeList.get(r);
+			String routeid = dtor.getAsString("text");
+			String date = dto.getAsString("date");
+			dto.put("routeid", routeid);
+			// 早高峰
+			int runs = 0;
+			int runscount = 0;
+			List areaList = g4Reader.queryForList("Bus.queryBusPeakM", dto);
+			for (int i = 0; i < areaList.size(); i++) {
+				Dto d = (Dto) areaList.get(i);
+				String m_start = d.getAsString("m_start");
+				String m_end = d.getAsString("m_end");
+				runs += Integer.parseInt(d.getAsString("runs").equals("") ? "0"
+						: d.getAsString("runs"));
+				dto.put("m_start", m_start);
+				dto.put("m_end", m_end);
+				List mlist = g4Reader.queryForList("Bus.queryBusPeakMCount",
+						dto);
+				for (int j = 0; j < mlist.size(); j++) {
+					Dto dm = (Dto) mlist.get(j);
+					runscount += Integer.parseInt(dm.getAsString("runscount")
+							.equals("") ? "0" : dm.getAsString("runscount"));
+				}
+			}
+			Dto outDto = new BaseDto();
+			outDto.put("date", date);
+			outDto.put("routeid", routeid);
+			outDto.put("runs", runs);
+			outDto.put("runscount", runscount);
+			if (runscount == 0) {
+				outDto.put("runsrate", 0);
+			} else {
+				outDto.put("runsrate", (new Float(runs))
+						/ (new Float(runscount)) + "%");
+			}
+			list.add(outDto);
+		}
+		String jsonString = JsonHelper.encodeObject2Json(list);
+		write(jsonString, response);
+		return mapping.findForward(null);
+	}
+
+	/**
+	 * 全天班次执行情况查询
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward queryBusCompletionDay(ActionMapping mapping,
+			ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		CommonActionForm aForm = (CommonActionForm) form;
+		Dto dto = aForm.getParamAsDto(request);
+		List routeList = g4Reader.queryForList("Bus.queryRouteByCompany", dto);
+		List list = new ArrayList();
+		for (int r = 0; r < routeList.size(); r++) {
+			Dto dtor = (BaseDto) routeList.get(r);
+			String routeid = dtor.getAsString("text");
+			String date = dto.getAsString("date");
+			dto.put("routeid", routeid);
+
+			int runs_day = 0;
+			int runscount = 0;
+			List areaList = g4Reader.queryForList("Bus.queryBusDay", dto);
+			for (int i = 0; i < areaList.size(); i++) {
+				Dto d = (Dto) areaList.get(i);
+				runs_day += Integer.parseInt(d.getAsString("runs_day").equals(
+						"") ? "0" : d.getAsString("runs_day"));
+				List daylist = g4Reader.queryForList("Bus.queryBusDayCount",
+						dto);
+				for (int j = 0; j < daylist.size(); j++) {
+					Dto dm = (Dto) daylist.get(j);
+					runscount += Integer.parseInt(dm.getAsString("runscount")
+							.equals("") ? "0" : dm.getAsString("runscount"));
+				}
+			}
+			Dto outDto = new BaseDto();
+			outDto.put("date", date);
+			outDto.put("routeid", routeid);
+			outDto.put("runs", runs_day);
+			outDto.put("runscount", runscount);
+			if (runscount == 0) {
+				outDto.put("runsrate", 0);
+			} else {
+				outDto.put("runsrate", (new Float(runs_day))
+						/ (new Float(runscount)) + "%");
+			}
+			list.add(outDto);
+		}
+		String jsonString = JsonHelper.encodeObject2Json(list);
+		write(jsonString, response);
+		return mapping.findForward(null);
+	}
+
+	/**
+	 * 平峰发车间隔
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward queryBusSpaceTest(ActionMapping mapping,
+			ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		CommonActionForm aForm = (CommonActionForm) form;
+		Dto dto = aForm.getParamAsDto(request);
+
+		List areaList = g4Reader.queryForList("Bus.queryBusPeakM", dto);
+		String flat_start = "";
+		String flat_end = "";
+		String avg = "";
+		System.out.println(areaList.toString());
+		for (int i = 0; i < areaList.size(); i++) {
+			Dto d = (Dto) areaList.get(i);
+			if (i == 0) {
+				flat_start = d.getAsString("m_end");
+			} else {
+				flat_end = d.getAsString("m_start");
+				avg = d.getAsString("avg");
+			}
+		}
+
+		dto.put("flat_start", dto.getAsString("date") + " " + flat_start);
+		dto.put("flat_end", dto.getAsString("date") + " " + flat_end);
+		List avglist = g4Reader.queryForList("Bus.queryBusSpaceAvg", dto);
+		for (int i = 0; i < avglist.size(); i++) {
+			Dto dtoavg = (Dto) avglist.get(i);
+			String jiange = dtoavg.getAsString("jiange");
+			dtoavg.put("date", dto.getAsString("date"));
+			if (jiange.equals("")) {
+				dtoavg.put("jiange", " ");
+				dtoavg.put("qualified", " ");
+				dtoavg.put("diff", " ");
+			} else {
+				System.out.println(jiange);
+				String[] jianges = jiange.split(":");
+				String jiangestring = jianges[1].replaceAll("0", "")
+						+ "."
+						+ (Double.parseDouble(jianges[2]) / 60 + "")
+								.replaceAll("0.", "");
+				dtoavg.put("jiange", jiangestring);
+				Double diff = Double.parseDouble(jiangestring)
+						- Double.parseDouble(avg);
+				String qualified = "不合格";
+				if (diff > 0) {
+					qualified = "合格";
+				}
+				dtoavg.put("avg", avg);
+				dtoavg.put("qualified", qualified);
+				dtoavg.put("diff", diff);
+			}
+
+		}
+		System.out.println(avglist.toString());
+		String jsonString = JsonHelper.encodeObject2Json(avglist);
+		write(jsonString, response);
+		return mapping.findForward(null);
+	}
+
+	/**
+	 * 高峰间隔验证
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward queryBusPeakSpaceTest(ActionMapping mapping,
+			ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		CommonActionForm aForm = (CommonActionForm) form;
+		Dto dto = aForm.getParamAsDto(request);
+
+		List areaList = g4Reader.queryForList("Bus.queryBusPeakM", dto);
+		String flat_start = "";
+		String flat_end = "";
+		String peakavg = "";
+		for (int i = 0; i < areaList.size(); i++) {
+			Dto d = (Dto) areaList.get(i);
+			if (i == 1) {
+				peakavg = d.getAsString("peakavg");
+			}
+		}
+		List resultlist = new ArrayList();
+		for (int i = 0; i < areaList.size(); i++) {
+			Dto d = (Dto) areaList.get(i);
+			dto.put("flat_start",
+					dto.getAsString("date") + " " + d.getAsString("m_start"));
+			dto.put("flat_end",
+					dto.getAsString("date") + " " + d.getAsString("m_end"));
+			List avglist = g4Reader.queryForList("Bus.queryBusSpaceAvg", dto);
+			for (int j = 0; j < avglist.size(); j++) {
+				Dto dtoavg = (Dto) avglist.get(j);
+				String jiange = dtoavg.getAsString("jiange");
+				dtoavg.put("date", dto.getAsString("date"));
+				if (jiange.equals("")) {
+					dtoavg.put("jiange", " ");
+					dtoavg.put("qualified", " ");
+					dtoavg.put("diff", " ");
+				} else {
+					System.out.println(jiange);
+					String[] jianges = jiange.split(":");
+					String jiangestring = jianges[1].replaceAll("0", "")
+							+ "."
+							+ (Double.parseDouble(jianges[2]) / 60 + "")
+									.replaceAll("0.", "");
+					dtoavg.put("jiange", jiangestring);
+					Double diff = Double.parseDouble(jiangestring)
+							- Double.parseDouble(peakavg);
+					String qualified = "不合格";
+					if (diff > 0) {
+						qualified = "合格";
+					}
+					dtoavg.put("avg", peakavg);
+					dtoavg.put("qualified", qualified);
+					dtoavg.put("diff", diff);
+				}
+				resultlist.add(dtoavg);
+			}
+		}
+		String jsonString = JsonHelper.encodeObject2Json(resultlist);
+		write(jsonString, response);
+		return mapping.findForward(null);
+	}
+
+	/**
+	 * 线路运行大间隔识别与统计
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward busPeak_View(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		CommonActionForm aForm = (CommonActionForm) form;
+		Dto dto = aForm.getParamAsDto(request);String updown_name = dto.getAsString("updown_name");// 峰期
+		String plan_name = dto.getAsString("plan_name");
+		List areaList = null;
+		if ("1".equals(updown_name)) {
+			if ("1".equals(plan_name)) {
+				areaList = g4Reader.queryForList("Bus.querybuspeakviewG_A", dto);
+			} else if ("2".equals(plan_name)) {
+				areaList = g4Reader.queryForList("Bus.querybuspeakviewG_B", dto);
+			} else if ("3".equals(plan_name)) {
+				areaList = g4Reader.queryForList("Bus.querybuspeakviewG_C", dto);
+			}
+		} else if ("0".equals(updown_name)) {
+			if ("1".equals(plan_name)) {
+				areaList = g4Reader.queryForList("Bus.querybuspeakviewP_A", dto);
+			} else if ("2".equals(plan_name)) {
+				areaList = g4Reader.queryForList("Bus.querybuspeakviewP_B", dto);
+			} else if ("3".equals(plan_name)) {
+				areaList = g4Reader.queryForList("Bus.querybuspeakviewP_C", dto);
+			}
+		}
+
+		String jsonString = JsonHelper.encodeObject2Json(areaList);
+		write(jsonString, response);
+		return mapping.findForward(null);
+	}
+
+	/**
+	 * 串车发现
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward busChuanView(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		CommonActionForm aForm = (CommonActionForm) form;
+		Dto dto = aForm.getParamAsDto(request);
+		List areaList = g4Reader.queryForList("Bus.querybuschuanview", dto);
+		String jsonString = JsonHelper.encodeObject2Json(areaList);
+		write(jsonString, response);
+		return mapping.findForward(null);
+	}
+
+	/**
+	 * 断面车次通过率
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward queryBusSectionRuns(ActionMapping mapping,
+			ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		CommonActionForm aForm = (CommonActionForm) form;
+		Dto dto = aForm.getParamAsDto(request);
+		List areaList = g4Reader.queryForList("Bus.queryBusSectionRuns", dto);
+		String jsonString = JsonHelper.encodeObject2Json(areaList);
+		write(jsonString, response);
+		return mapping.findForward(null);
+	}
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }

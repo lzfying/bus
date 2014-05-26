@@ -202,6 +202,36 @@ var routeCombo = new Ext.form.ComboBox({
 							value = value.replace("[","(");
 							return value;
 						}
+					}, {
+						header : '站点序号1',
+						width : 200,
+						dataIndex : 'position',
+						renderer:function(value){
+							//alert(value);
+							//alert(Object.prototype.toString.apply(value));
+							
+							var pronum = parseInt(value)-1;
+							if(pronum==0){
+								
+								return '-'
+							}else{
+								
+								return '第'+pronum+'站';
+							}
+							
+						}
+					},{
+						header : '站点序号2',
+						width : 150,
+						dataIndex : 'position',
+						renderer:function(value){
+							//alert(value);
+							//alert(Object.prototype.toString.apply(value));
+							
+							return '第'+value+'站';
+						}
+						
+						
 					},{
 						header : '实际平均速度(公里/小时)',
 						width : 150,
@@ -251,6 +281,8 @@ var routeCombo = new Ext.form.ComboBox({
 											name : 'weather'
 										},{
 											name : 'timesection'
+										}, {
+											name : 'position'
 										}, {
 											name : 'realspeed'
 										},{

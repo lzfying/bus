@@ -8,131 +8,68 @@
 <style type="text/css">
 body, html,#allmap {width: 100%;height: 100%;overflow: hidden;margin:0;}
 </style>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
+<script src="app/modules/mapshow/js/jquery.min.js"></script>
 <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=BP3QtYgK2SY5WwA6i2Ug0TGh&callback"></script>
+<link href="app/modules/mapshow/css/showmap.css" rel="stylesheet" type="text/css" />
 <title>显示速度</title>
 </head>
 <body>
 <div style=" width:100%; height:100%;">
-  <div>
+  <div id="allmap"></div>
+	<div id="formdiv"><!-- display:none; -->
+	<div>
     <form action="">
-	日期
-      <input type="text" name="date" id="date" value='2014-03-26'>
-     时间段选择
-	 <select name="timesection" id="timesection">
-		<option value="[05:30~06:00)">05:30~06:00</option>
-		<option value="[06:00~06:30)">06:00~06:30</option>
-		<option value="[06:30~07:00)" selected="selected">06:30~07:00</option>
-		<option value="[07:00~07:30)">07:00~07:30</option>
-		<option value="[07:30~08:00)">07:30~08:00</option>
-		<option value="[08:00~08:30)">08:00~08:30</option>
-		<option value="[08:30~09:00)">08:30~09:00</option>
-		<option value="[09:00~09:30)">09:00~09:30</option>
-		<option value="[09:30~10:00)">09:30~10:00</option>
-		<option value="[10:00~10:30)">10:00~10:30</option>
-		<option value="[10:30~11:00)">10:30~11:00</option>
-		<option value="[11:00~11:30)">11:00~11:30</option>
-		<option value="[11:30~12:00)">11:30~12:00</option>
-		<option value="[12:00~12:30)">12:00~12:30</option>
-		<option value="[12:30~13:00">12:30~13:00</option>
-		<option value="[13:00~13:30)">13:00~13:30</option>
-		<option value="[13:30~14:00)">13:30~14:00</option>
-		<option value="[14:00~14:30)">14:00~14:30</option>
-		<option value="[14:30~15:00)">14:30~15:00</option>
-		<option value="[15:00~15:30)">15:00~15:30</option>
-		<option value="[15:30~16:00)">15:30~16:00</option>
-		<option value="[16:00~16:30)">16:00~16:30</option>
-		<option value="[16:30~17:00)">16:30~17:00</option>
-		<option value="[17:00~17:30)">17:00~17:30</option>
-		<option value="[17:30~18:00)">17:30~18:00</option>
-		<option value="[18:00~18:30)">18:00~18:30</option>
-		<option value="[18:30~19:00)">18:30~19:00</option>
-		<option value="[19:00~19:30)">19:00~19:30</option>
+		<div id="inputdiv">
+			<div id="inputname" align="right" >日期:&nbsp;</div>
+			<div id="inputfield" align="center"><input type="text" name="date" size="18" id="date" value='2014-03-26'></div>
+		</div>
+		<div id="inputdiv2">
+			<div id="inputname" align="right" >时间段:&nbsp;</div>
+			<div id="inputfield" align="center">
+			<select name="timesection" id="timesection">
+				<option value="[05:30~06:00)">05:30~06:00</option>
+				<option value="[06:00~06:30)">06:00~06:30</option>
+				<option value="[06:30~07:00)" selected="selected">06:30~07:00</option>
+				<option value="[07:00~07:30)">07:00~07:30</option>
+				<option value="[07:30~08:00)">07:30~08:00</option>
+				<option value="[08:00~08:30)">08:00~08:30</option>
+				<option value="[08:30~09:00)">08:30~09:00</option>
+				<option value="[09:00~09:30)">09:00~09:30</option>
+				<option value="[09:30~10:00)">09:30~10:00</option>
+				<option value="[10:00~10:30)">10:00~10:30</option>
+				<option value="[10:30~11:00)">10:30~11:00</option>
+				<option value="[11:00~11:30)">11:00~11:30</option>
+				<option value="[11:30~12:00)">11:30~12:00</option>
+				<option value="[12:00~12:30)">12:00~12:30</option>
+				<option value="[12:30~13:00">12:30~13:00</option>
+				<option value="[13:00~13:30)">13:00~13:30</option>
+				<option value="[13:30~14:00)">13:30~14:00</option>
+				<option value="[14:00~14:30)">14:00~14:30</option>
+				<option value="[14:30~15:00)">14:30~15:00</option>
+				<option value="[15:00~15:30)">15:00~15:30</option>
+				<option value="[15:30~16:00)">15:30~16:00</option>
+				<option value="[16:00~16:30)">16:00~16:30</option>
+				<option value="[16:30~17:00)">16:30~17:00</option>
+				<option value="[17:00~17:30)">17:00~17:30</option>
+				<option value="[17:30~18:00)">17:30~18:00</option>
+				<option value="[18:00~18:30)">18:00~18:30</option>
+				<option value="[18:30~19:00)">18:30~19:00</option>
+				<option value="[19:00~19:30)">19:00~19:30</option>
+			</select>
+			</div>
+		</div>
+		<div id="submitdiv"><input type="button" id="submit" onmouseover=this.style.background='#deeff7' onmouseout=this.style.background='#9ad7f4' value="提交">
 		
-	</select>
-   	  <input type="button" value="提交" onClick="showspeedview()">
+		</div>
     </form>
-  </div>
-  <div id="allmap" style=" width:100%; height:100%;"></div>
+		<div id="hr" >&nbsp;</div>
+		<div id="result">
+		</div>
+	</div>
+	<div id="hidediv" onmouseover=this.style.background='#deeff7' onmouseout=this.style.background='#ffffff'>隐藏弹窗<br/><</div>
+  	</div>
+	<div id="showbutton" onmouseover=this.style.background='#deeff7' onmouseout=this.style.background='#ffffff'>显示弹窗<br/>></div>
 </div>
 </body>
 </html>
-<script type="text/javascript">
-
-// 百度地图API功能
-var map = new BMap.Map("allmap");
-var point = new BMap.Point(117.007863, 36.676649);
-map.centerAndZoom(point, 15);
-map.enableScrollWheelZoom();
-
-function showspeedview(){
-	map.clearOverlays();
-	$.getJSON("mapshow.do?reqCode=querySpeedMap",{
-	timesection:document.getElementById("timesection").value,
-	date:document.getElementById("date").value,
-	loginuserid:"developer"
-	},function(js){
-		var obj = eval(js);
-		for(var i=0;i<obj.length;i++){
-			showeveryroutespeed(obj[i]);
-		}		
-	});
-}
-
-function showeveryroutespeed(objs){
-	color = "red";
-	
-	//alert("1111");
-	
-	
-	var speed = parseInt(objs.realspeed.toFixed(2));
-	
-	if(15 <= speed &&speed<25 ){
-	console.log('111111111111111'+speed);
-		color = "yellow";
-	}else if( speed >= 25){
-		color = "green";
-		
-	}
-	/*
-	$.getJSON("mapshow.do?reqCode=queryRoad",{
-	pos:objs.pos,
-	posp:objs.posp,
-	loginuserid:"developer"
-	},
-	function(js){
-		var obj =  eval(js);
-		var points = [];
-		for(var i=0;i<obj.length;i++){
-			point=new BMap.Point(obj[i].lng, obj[i].lat);
-			points[i]=point;
-		}
-		console.log('22222222222222'+color);
-		var polyline = new BMap.Polyline(points, {strokeColor:color, strokeWeight:3,strokeStyle:"ridge"});
-				
-		map.addOverlay(polyline);		
-	});*/
-	
-	
-	$.ajax({
-	 sync:false,
-	 type: 'POST',
- 	 url: "mapshow.do?reqCode=queryRoad",
-	 data:{pos:objs.pos,posp:objs.posp,color:color},
- 	 success: function(js){
-		var obj =  eval(js);
-		var points = [];
-		for(var i=0;i<obj.length;i++){
-			point=new BMap.Point(obj[i].lng, obj[i].lat);
-			points[i]=point;
-		}
-		console.log('22222222222222'+color);
-		var polyline = new BMap.Polyline(points, {strokeColor:obj[0].color, strokeWeight:3,strokeStyle:"ridge"});
-				
-		map.addOverlay(polyline);		
-	},
- 	 dataType:'json'
-});
-		
-}
-</script>
+<script type="text/javascript" language="javascript" src="app/modules/mapshow/js/showspeedmap.js" charset="utf-8"></script>

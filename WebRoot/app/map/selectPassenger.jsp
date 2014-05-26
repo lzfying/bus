@@ -27,6 +27,61 @@ body {
 	padding: 0px
 }
 
+.btn-container {
+	margin: 20px;
+}
+
+fieldset {
+	border: 1px solid;
+	border-radius: 3px;
+}
+
+fieldset label {
+	font-size: 14px;
+	line-height: 30px;
+}
+
+.btn {
+	color: #333;
+	background-color: #fff;
+	display: inline-block;
+	padding: 6px 12px;
+	font-size: 14px;
+	font-weight: normal;
+	line-height: 1.428571429;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+.btn:hover {
+	color: #333;
+	background-color: #ebebeb;
+	border-color: #adadad;
+}
+
+.text-primary {
+	font-weight: bold;
+}
+
+textarea {
+	border: 1px solid #ccc;
+	border-radius: 4px;
+}
+
+textarea:focus {
+	border-color: #66afe9;
+	outline: 0;
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px
+		rgba(102, 175, 233, 0.6);
+}
+
+.color-list li {
+	font-size: 14px;
+	line-height: 30px;
+}
+
 #container {
 	height: 100%
 }
@@ -36,22 +91,22 @@ body {
 	width: 500px;
 	height: 50px;
 	z-index: 100000;
-	margin-left: 220px;
+	margin-left: 300px;
 	margin-top: 5px;
 }
 
 #apDiv3 {
 	position: absolute;
 	width: 800px;
-	height: 60px;
+	height: 150px;
 	z-index: 2;
-	right: 5px;
-	bottom: 10px;
+	right: 2px;
+	bottom: 5px;
 }
 
 #apDiv100 {
 	position: absolute;
-	width: 200px;
+	width: 280px;
 	height: 50px;
 	z-index: 2;
 	margin-left: 5px;
@@ -64,10 +119,11 @@ body {
 			src="http://api.map.baidu.com/library/SearchInfoWindow/1.5/src/SearchInfoWindow_min.js"></script>
 		<script type="text/javascript"
 			src="<%=basePath%>/js/jquery-1.6.2.min.js"></script>
+		<script type="text/javascript" src="<%=basePath%>/js/chart.js"></script>
 		<script type="text/javascript"
 			src="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.js"></script>
 		<script type="text/javascript"
-			src="<%=basePath%>/FusionCharts/FusionCharts.js"></SCRIPT>
+			src="<%=basePath%>/FusionCharts/Charts/FusionCharts.js"></SCRIPT>
 		<link rel="stylesheet"
 			href="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.css" />
 		<!--加载检索信息窗口-->
@@ -77,7 +133,10 @@ body {
 			href="http://api.map.baidu.com/library/SearchInfoWindow/1.4/src/SearchInfoWindow_min.css" />
 		<link rel="stylesheet"
 			href="http://api.map.baidu.com/library/SearchInfoWindow/1.5/src/SearchInfoWindow_min.css" />
+		<script type="text/javascript"
+			src="http://api.map.baidu.com/library/Heatmap/2.0/src/Heatmap_min.js"></script>
 		<script type="text/javascript">
+		
 
 var map =null;
 // 地图展示
@@ -89,9 +148,12 @@ map.addControl(new BMap.OverviewMapControl());
 map.addControl(new BMap.MapTypeControl());
 map.enableScrollWheelZoom();
 map.enableContinuousZoom();
+//116.418261, 39.921984   --北京
+//116.960997, 36.6814599  --济南
 var point = new BMap.Point(116.960997, 36.6814599); 
 map.centerAndZoom(point, 15);
-tj_KLL();
+tj_KLL(null);
+init2();
 }
 
 // 编写自定义函数,创建标注
@@ -142,6 +204,12 @@ $.ajax({
 					}else{
 						// 清楚搜有覆盖物
 						map.clearOverlays();
+						
+						var categoriesStr = '<categories>';
+						var xAxisStr = '<dataset seriesName="高峰上客">';
+						var xAxisStr2 = '<dataset seriesName="高峰下客">';
+						var yAxisStr = '<dataset seriesName="高峰断面" parentYAxis="S">';
+
 						var tableStr='<table id="mytable" style="width:100%;" cellspacing="1"><tr><th scope="col">线路</th><th scope="col">站点'+
 						'</th><th scope="col">站点名称</th></tr>';
 						var stas=msg.split("|");
@@ -177,9 +245,8 @@ $.ajax({
 							  	  	sxx=stas_attres[5].split("=")[1];
 							  	  }
 							  	  if(stas_attres[6].split("=").length>1){
-							  	  	p_down=stas_attres[6].split("=")[1];
 							  	  	// 客流上客
-							  	  	strXML=strXML+"<set name='"+route_id+"-"+station_id+"' value='"+stas_attres[6].split("=")[1]+"' color='AFD8F8'/>";
+							  	  	p_down=stas_attres[6].split("=")[1];
 							  	  }
 							  	  if(stas_attres[7].split("=").length>1){
 							  	    // 客流下客
@@ -191,6 +258,10 @@ $.ajax({
 							  	  }
 								  var point = new BMap.Point(baidu_lng, baidu_lat);
 								  addMarker(point,station_name,sxx);
+								  categoriesStr += '<category label="'+route_id+'-'+station_id+'" labelDisplay="Rotate" slantLabels="1"/>';
+							  	  xAxisStr += '<set value="'+p_down+'"/>';
+								  xAxisStr2 += '<set value="'+p_up+'"/>';
+								  yAxisStr += '<set value="'+p_duan+'"/>';
 							  }
 							}
 							tableStr=tableStr+'</tr>';
@@ -198,8 +269,12 @@ $.ajax({
 						tableStr=tableStr+'</table>';
 						document.getElementById("showTable").innerHTML=tableStr;
 						var point = new BMap.Point(lng,lat); 
-						map.centerAndZoom(point, 15);  
-						tj_KLL(strXML);
+						//map.centerAndZoom(point, 15);  
+						categoriesStr += '</categories>';
+						xAxisStr += '</dataset>';
+						xAxisStr2 += '</dataset>';
+						yAxisStr += '</dataset>';
+						tj_KLL(categoriesStr,xAxisStr,xAxisStr2,yAxisStr);
 						closeDraw();
 					}
 				}
@@ -258,13 +333,69 @@ document.getElementById("openTool").disabled = false;
 }
 
 // 统计客流量
-function tj_KLL(strXML){
-var strXML="<graph caption='高峰客流量'>"+strXML+"</graph>";
-var chart3 = new FusionCharts("<%=basePath%>/FusionCharts/FCF_Line.swf", "chart3Id", "800", "140"); 
-chart3.setDataXML(strXML);
-chart3.render("chart3div");
+function tj_KLL(categoriesStr,xAxisStr,xAxisStr2,yAxisStr){
+	var xml_str = '<categories></categories><dataset seriesName="高峰上客"></dataset><dataset seriesName="高峰下客"></dataset><dataset seriesName="高峰断面" parentYAxis="S"></dataset>'
+	var combinationChart1 = new FusionCharts("<%=basePath%>/FusionCharts/Charts/MSCombiDY2D.swf", "combinationChart1", "800px", "150", "0", "1" );
+	var combinationChartDataString = null;
+	if(categoriesStr==null||categoriesStr==""){
+		combinationChartDataString = ' <chart caption="高峰期客流量统计分析图" unescapeLinks="0" PYAxisName="上下人数" SYAxisName="断面人数" formatNumberScale="0" showBorder="0" showValues="0" showLabels="1" bgColor="#FFFFFF" paletteColors="#4F81BD,#FFFF6B,#C0504D" exportEnabled="1"  plotSpacePercent="40" palette = "3" useRoundEdges="1" setAdaptiveYMin="1" setAdaptiveSYMin="1" lineThickness="3">\n\	'+
+		'<categories><category label=" " labelDisplay="Rotate" slantLabels="1"/></categories><dataset seriesName="高峰上客"><set value="0"/></dataset><dataset seriesName="高峰下客"><set value="0"/></dataset><dataset seriesName="高峰断面" parentYAxis="S"><set value="0"/></dataset> </chart>';
+	}else{
+		combinationChartDataString = ' <chart caption="高峰期客流量统计分析图" unescapeLinks="0" PYAxisName="上下人数" SYAxisName="断面人数" formatNumberScale="0" showBorder="0" showValues="0" showLabels="1" bgColor="#FFFFFF" paletteColors="#4F81BD,#FFFF6B,#C0504D" exportEnabled="1"  plotSpacePercent="40" palette = "3" useRoundEdges="1" setAdaptiveYMin="1" setAdaptiveSYMin="1" lineThickness="3">\n\	'+
+		categoriesStr+xAxisStr+xAxisStr2+yAxisStr+' </chart>';
+	}		
+	combinationChart1.setXMLData( combinationChartDataString );
+	combinationChart1.render("chart3div");
 }
 
+// 热力图展示
+function init2(){
+  var lng="";
+  var lat="";
+  var routeId=document.getElementById("routeId").value;
+  if(routeId=="选择公交路线"){
+  return;
+  }
+  var points = new Array();
+  $.ajax({
+				type:"POST",
+				url:"<%=basePath%>/servlet/HotPointServlet",
+				data:{flag:'1',
+				      routeId:routeId},
+				success:function (msg){
+				
+					// 清楚搜有覆盖物
+					map.clearOverlays();
+					
+					var stas=msg.split("|");
+						if(stas.length>0){
+							for (var i = 0; i < 10; i ++) {
+							  var stas_attres=stas[i].split("@");
+							  if(stas_attres.length>2){
+							  lng=stas_attres[0].split("=")[1];
+							  lat=stas_attres[1].split("=")[1];
+							  points.push({"lng":stas_attres[0].split("=")[1],"lat":stas_attres[1].split("=")[1],"count":stas_attres[2].split("=")[1]});
+							  }
+							}
+						}
+						
+						console.log(points);
+						if(!isSupportCanvas()){
+					    	alert('热力图目前只支持有canvas支持的浏览器,您所使用的浏览器不能使用热力图功能~')
+					    }
+						heatmapOverlay = new BMapLib.HeatmapOverlay({"radius":20});
+						map.addOverlay(heatmapOverlay);
+						heatmapOverlay.setDataSet({data:points,max:200});
+						var poi = new BMap.Point(lng, lat); 
+						map.centerAndZoom(poi, 15);
+				}
+				});
+  } 
+	
+function isSupportCanvas(){
+        var elem = document.createElement('canvas');
+        return !!(elem.getContext && elem.getContext('2d'));
+}
 </script>
 	</head>
 	<body onload="init();">
@@ -274,6 +405,31 @@ chart3.render("chart3div");
 			<input type="button" value="清除选区" onclick="clearMap();" />
 		</div>
 		<div id="apDiv100">
+			<table>
+				<tr>
+					<th scope="col" align="right" style="width: 45%;">
+						公交线路：
+					</th>
+					<th colspan="2" scope="col">
+						<select id="routeId" name="routeId" style="width: 100px;"
+							onchange="init2();">
+							<option>
+								选择公交路线
+							</option>
+							<option value="1">
+								1
+							</option>
+							<option value="2">
+								2
+							</option>
+							<option value="115">
+								115
+							</option>
+						</select>
+						路
+					</th>
+				</tr>
+			</table>
 			<div id="showTable" style="height: 500px; overflow: auto;">
 				<table id="mytable" style="width: 100%;" cellspacing="1">
 					<tr>
@@ -288,7 +444,7 @@ chart3.render("chart3div");
 						</th>
 					</tr>
 					<tr>
-					<td>
+						<td>
 						</td>
 						<td>
 						</td>

@@ -196,6 +196,11 @@ var routeCombo = new Ext.form.ComboBox({
 				                	var datastr4= new Array(); 
 				                	var str3= new Array(); 
 				                	var str4= new Array(); 
+				                	
+				                	var datastr5= new Array(); 
+				                	var datastr6= new Array(); 
+				                	var str5= new Array(); 
+				                	var str6= new Array();
 				                	var re= new Array(); 
 				                	re=response.responseText.split("*"); 
 				                	
@@ -246,11 +251,36 @@ var routeCombo = new Ext.form.ComboBox({
 				                		datastr4[i]=tmp;
 				                	}
 				                	
+				                	str5=re[4].split("|");
+				                	
+				                	
+				                	for(var i=0;i<str5.length;i++){
+				                		var array = new Array();
+				                		var tmp = new Array();
+				                		array=str5[i].split(",");
+				                		tmp[0]=parseFloat(array[0]);
+				                		tmp[1]=parseFloat(array[1]);
+				                		datastr5[i]=tmp;
+				                	}
+				                	
+				                	str6=re[5].split("|"); 
+				                	
+				                	for(var i=0;i<str6.length;i++){
+				                		var array = new Array();
+				                		var tmp = new Array();
+				                		array=str6[i].split(",");
+				                		tmp[0]=parseFloat(array[0]);
+				                		tmp[1]=parseFloat(array[1]);
+				                		datastr6[i]=tmp;
+				                	}
+				                	
 				                	
 				                	chart.series[0].setData(datastr1);  
 				                	chart.series[1].setData(datastr2);  
 				                	chart.series[2].setData(datastr3);  
 				                	chart.series[3].setData(datastr4);  
+				                	chart.series[4].setData(datastr5);  
+				                	chart.series[5].setData(datastr6); 
 				                	
 				                  //  Ext.MessageBox.alert('成功', '从服务端获取结果: ' + response.responseText);
 				
@@ -524,7 +554,18 @@ var routeCombo = new Ext.form.ComboBox({
 			
 			
 			
-			
+			function datetime_to_unix(datetime){
+			    var tmp_datetime = datetime.replace(/:/g,'-');
+			    tmp_datetime = tmp_datetime.replace(/ /g,'-');
+			    var arr = tmp_datetime.split("-");
+			    var now = new Date(Date.UTC(arr[0],arr[1]-1,arr[2],arr[3]-8,arr[4],arr[5]));
+			    return parseInt(now.getTime());
+			}
+			 
+			function unix_to_datetime(unix) {
+			    var now = new Date(parseInt(unix) * 1000);
+			    return now.toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ");
+			}
 			
 			
 			
@@ -553,20 +594,17 @@ var routeCombo = new Ext.form.ComboBox({
 		            xAxis: {                                                                             
 		            	//type: 'datetime',
 		            	//tickPixelInterval: 0.5,
-		            	startOnTick: true,                                                               
-		                endOnTick: true,  
-		                title: {                                                                         
-		                    text: '时间区间'                                                          
-		                } ,
+		            	
 		                labels: {
-		                	formatter: function() {
-		                        return this.value +'点'
-		                    }
+		                	 formatter: function() { 
+		                         
+	                               return  this.value+':00:00'; 
+		                	 }
 		                }                                                           
 		            },                                                                                   
 		            yAxis: {                                                                             
 		                title: {                                                                         
-		                    text: '周转时间 (分钟)'                                                          
+		                    text: '班次'                                                          
 		                }                                                                                
 		            },                                                                                   
 		            legend: {                                                                            
@@ -601,7 +639,7 @@ var routeCombo = new Ext.form.ComboBox({
 		                        }                                                                        
 		                    },                                                                           
 		                    tooltip: {                                                                   
-		                        headerFormat: '<b>{series.name}</b><br>',                                
+		                        headerFormat: '<b>{series.name}:00:00</b><br>',                                
 		                        pointFormat: '{point.x}  , {point.y} 分钟'                                
 		                    }                                                                            
 		                }                                                                                
@@ -642,7 +680,25 @@ var routeCombo = new Ext.form.ComboBox({
 		                	lineColor: Highcharts.getOptions().colors[1],
 		                	fillColor: 'white'
 		                }
-		            } ]                                                                                   
+		            },{
+		                type: 'spline',
+		                name: '下行早峰计划',
+		                data: [],
+		                marker: {
+		                	lineWidth: 2,
+		                	lineColor: Highcharts.getOptions().colors[1],
+		                	fillColor: 'white'
+		                }
+		            } ,{
+		                type: 'spline',
+		                name: '下行晚峰计划',
+		                data: [],
+		                marker: {
+		                	lineWidth: 2,
+		                	lineColor: Highcharts.getOptions().colors[1],
+		                	fillColor: 'white'
+		                }
+		            }]                                                                                   
 		        
 		        	
 		        });

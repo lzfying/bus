@@ -224,6 +224,7 @@ var routeCombo = new Ext.form.ComboBox({
 					},{
 						header : '差值比例',
 						width : 150,
+						//hidden : true,
 						dataIndex : 'ratio',
 						renderer:function(value){
 							return value.toFixed(2);

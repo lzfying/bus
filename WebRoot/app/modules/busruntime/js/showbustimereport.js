@@ -2,6 +2,7 @@
  * FlashReport报表综合实例(动态数据源|动态报表类型)
  */
 Ext.onReady(function() {
+	Ext.Ajax.timeout = 180000; 
 	var updownstore = new Ext.data.SimpleStore({
 		fields : ['name', 'code'],
 		data : [['下行', 'Down'], ['上行', 'Up']]

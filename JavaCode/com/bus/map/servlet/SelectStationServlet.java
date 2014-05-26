@@ -2,7 +2,6 @@ package com.bus.map.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.URLEncoder;
 import java.util.List;
 
 import javax.servlet.ServletException;

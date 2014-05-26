@@ -134,14 +134,14 @@ var routeCombo = new Ext.form.ComboBox({
 								labelWidth : 60, // 标签宽度
 								defaultType : 'textfield',
 								border : false,
-								items : [updownCombo,{
+								items : [{
 							        xtype : 'datefield',
 									fieldLabel : '日期', // 标签
 									id:'datetime',
 									name : 'datetime', // name:后台根据此name属性取值 
 									format:'Y-m-d', //日期格式化
 									maxValue:'2014-12-31', //允许选择的最大日期
-									minValue:'2014-05-01', //允许选择的最小日期
+									//minValue:'2014-05-01', //允许选择的最小日期
 									anchor : '100%' // 宽度百分比
 								}]
 							}, {
@@ -194,7 +194,7 @@ var routeCombo = new Ext.form.ComboBox({
 			// 定义列模型
 			var cm = new Ext.grid.ColumnModel([rownum, sm,   {
 						header : '线路',
-						dataIndex : 'routename',
+						dataIndex : 'routeid',
 						//hidden : true, // 隐藏列
 						sortable : true,
 						width : 50
@@ -203,27 +203,24 @@ var routeCombo = new Ext.form.ComboBox({
 						header : '日期',
 						dataIndex : 'datetime',
 						sortable : true,
+						hidden : true,
 						width : 60
 					}, {
 						header : '站点1',
-						dataIndex : 'site1',
+						dataIndex : 'uniquenum',
 						width : 30
 					}, {
 						header : '站点2',
 						width : 80,
-						dataIndex : 'site2'
+						dataIndex : 'uniquenumpro'
 					}, {
 						header : '时段',
 						width : 150,
-						dataIndex : 'timeinterval',
-						renderer:function(value){
-							value = value.replace("[","(");
-							return value;
-						}
+						dataIndex : 'timesection'
 					},  {
 						header : '平均速度',
 						width : 150,
-						dataIndex : 'avspeed',
+						dataIndex : 'speed',
 						renderer:function(value){
 							//alert(Object.prototype.toString.apply(value));
 							return value.toFixed(2);
@@ -232,33 +229,17 @@ var routeCombo = new Ext.form.ComboBox({
 					},{
 						header : '标准平均速度',
 						width : 150,
-						dataIndex : 'standspeed',
+						dataIndex : 'speedavg',
 						renderer:function(value){
 							return value.toFixed(2);
 						}
 					},{
 						header : '差值比例',
 						width : 150,
-						dataIndex : 'ratio',
+						hidden : true,
+						dataIndex : 'cha',
 						renderer:function(value){
 							return value.toFixed(2);
-						}
-					}, {
-						header : '上行／下行',
-						width : 150,
-						dataIndex : 'upordown',
-						renderer:function(value){
-							if(value=="Up"){
-								return "上行";
-							}
-							else if(value=="Down"){
-								return "下行";
-							}
-							else {
-								return "none";
-								
-							}
-							
 						}
 					}]);
 
@@ -268,30 +249,27 @@ var routeCombo = new Ext.form.ComboBox({
 			var store = new Ext.data.Store({
 						// 获取数据的方式
 						proxy : new Ext.data.HttpProxy({
-									url :'busruntime.do?reqCode=queryTimebyRoute'
+									url :'busspeed.do?reqCode=queryroadblocked'
 								}),
 						// 数据读取器
 						reader : new Ext.data.JsonReader({},[ {
-											name : 'routename'
+											name : 'routeid'
 										}, {
 											name : 'datetime'
 										}, {
-											name : 'site1'
+											name : 'uniquenum'
 										}, {
-											name : 'site2'
+											name : 'uniquenumpro'
 										}, {
-											name : 'timeinterval'
+											name : 'timesection'
 										},  {
-											name : 'avspeed'
+											name : 'speed'
 										},{
 											
-											name : 'standspeed'
+											name : 'speedavg'
 										}, {
 											
-											name : 'ratio'
-										}, {
-											
-											name : 'upordown'
+											name : 'cha'
 										}])
 					});
 

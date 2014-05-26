@@ -1,7 +1,11 @@
 package org.bus.runtime.web;
 
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -72,6 +76,72 @@ public class BusSpeedAction extends BizAction {
 			HttpServletResponse response) throws Exception {
 		
 		return mapping.findForward("topspeedInitView");
+	}
+	
+	
+	/**
+	 * 停靠时间异常初始化
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward stoptimeInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		
+		return mapping.findForward("stoptimeInitView");
+	}
+	
+	/**
+	 * 路堵初始化
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward roadblockedInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		
+		return mapping.findForward("roadblockedInitView");
+	}
+	
+	/**
+	 * 常发路堵初始化
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward commonroadblockedInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		
+		return mapping.findForward("commonroadblockedInitView");
+	}
+	
+	
+	/**
+	 * 班次间隔初始化
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward bancijiangeInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		
+		return mapping.findForward("bancijiangeInitView");
 	}
 	
 	/**
@@ -290,12 +360,45 @@ public class BusSpeedAction extends BizAction {
 		List list =g4Reader.queryForList("Bus.querybustourReport", dto);
 		dto.put("upordown", "3");
 		List list1 =g4Reader.queryForList("Bus.querybustourReport", dto);
-
+		
+		String da= dto.getAsString("datetime");
+		String[] ee = new String[3];
+		ee=da.split("-");
+		dto.put("datetime", ee[0]+"-"+ee[1]+"-1");
+		List list2 =g4Reader.queryForList("Bus.getbanciplan", dto);
+		String re ="";
+		String re1 ="";
+		for(int i=0;i<list2.size();i++){
+			Dto d =(Dto) list2.get(i);
+			String[] arr = new String[3];
+			String ph = d.getAsString("m_start");
+			arr=ph.split(":");
+			int h= Integer.parseInt(arr[0]);
+			int m= Integer.parseInt(arr[1]);
+			
+			String[] arr1 = new String[3];
+			String ph1 = d.getAsString("m_end");
+			arr1=ph1.split(":");
+			int h1= Integer.parseInt(arr1[0]);
+			int m1= Integer.parseInt(arr1[1]);
+			
+			
+			String count = d.getAsString("runs");
+			if(i==0){
+				re=re+h+"."+arr[1]+","+count+"|";
+				re=re+h1+"."+arr1[1]+","+count+"|";
+			}else{
+				re1=re1+h+"."+arr[1]+","+count+"|";
+				re1=re1+h1+"."+arr1[1]+","+count+"|";
+			}
+			
+			
+		}
 		
 		String restr1= getStringDataFromList(list);
 		String restr2= getStringDataFromList(list1);
 		
-		super.write(restr1+"*"+restr2, response);
+		super.write(restr1+"*"+restr2+"*"+re+"*"+re1, response);
 		return mapping.findForward("querybustourReportInitView");
 	}
 	
@@ -332,6 +435,7 @@ public class BusSpeedAction extends BizAction {
 		List list =g4Reader.queryForList("Bus.queryroutespeedtop", dto);
 		dto.put("UporDown", "Up");
 		List list1 =g4Reader.queryForList("Bus.queryroutespeedtop", dto);
+		
 
 		list.addAll(list1);
 		
@@ -345,13 +449,22 @@ public class BusSpeedAction extends BizAction {
 	
 	
 	
-	public String getStringDataFromList(List list){
+	public String getStringDataFromList(List list) throws ParseException{
 		String re="";String re1="";
 		int total=0;
+		
+		SimpleDateFormat format =   new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
+
+	      
+	       //System.out.println("dd "+date.getTime());
 		for(int i=0;i<list.size();i++){
 			
 			Dto d = (Dto) list.get(i);
 			String hour= d.getAsString("hour");
+			 //String time="2014-01-06 "+hour+":00:00";
+
+		      //Date date = format.parse(time);
+		      //hour=date.getTime()+"";
 			String num= d.getAsString("num");
 			total=total+ d.getAsInteger("num");
 			re=re+hour+","+num+"|";
@@ -435,7 +548,7 @@ public class BusSpeedAction extends BizAction {
 			String speed = d.getAsString("standspeed");
 			if(speed.equals("")){
 				
-				speed="22";
+				speed="22.1";
 			}
 			speed=speed.substring(0, speed.indexOf("."));
 			String avspeed = d.getAsString("avspeed");
@@ -454,6 +567,155 @@ public class BusSpeedAction extends BizAction {
 		super.write(re+"*"+re1, response);
 		
 		
+		return mapping.findForward(null);
+	}
+	
+	
+	
+	/**
+	 * 停靠时间异常分页
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward querystoptime(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		
+		CommonActionForm aForm = (CommonActionForm) form;
+		Dto dto = aForm.getParamAsDto(request);
+		
+		String datetime= dto.getAsString("datetime");
+		String datetime1=datetime+" 00:00:30" ;
+		String datetime2= datetime+" 23:00:30" ;
+		dto.put("datetime1", datetime1);
+		dto.put("datetime2", datetime2);
+		List list =g4Reader.queryForList("Bus.querystoptime", dto);
+		
+		
+		String jsonString = JsonHelper.encodeObject2Json(list,  G4Constants.FORMAT_Date);
+		super.write(jsonString, response);
+		return mapping.findForward(null);
+	}
+	
+	/**
+	 * 路堵查询
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward queryroadblocked(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		
+		CommonActionForm aForm = (CommonActionForm) form;
+		Dto dto = aForm.getParamAsDto(request);
+		
+		String datetime= dto.getAsString("datetime");
+		String datetime1=datetime+" 00:00:30" ;
+		String datetime2= datetime+" 23:00:30" ;
+		dto.put("datetime1", datetime1);
+		dto.put("datetime2", datetime2);
+		List list =g4Reader.queryForList("Bus.queryroadblocked", dto);
+		
+		
+		String jsonString = JsonHelper.encodeObject2Json(list,  G4Constants.FORMAT_Date);
+		super.write(jsonString, response);
+		return mapping.findForward(null);
+	}
+	
+	/**
+	 * 常发路堵查询
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward querycommonroadblocked(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		
+		CommonActionForm aForm = (CommonActionForm) form;
+		Dto dto = aForm.getParamAsDto(request);
+		
+		String datetime= dto.getAsString("datetime");
+		String datetime1=datetime+" 00:00:30" ;
+		String datetime2= datetime+" 23:00:30" ;
+		dto.put("datetime1", datetime1);
+		dto.put("datetime2", datetime2);
+		
+		Dto sites =(Dto) getServlet().getServletContext().getAttribute("siteNameList");
+		
+		Dto timesection =(Dto) getServlet().getServletContext().getAttribute("timesection");
+		List list =g4Reader.queryForList("Bus.querycommonroadblocked", dto);
+		
+		for(int i=0;i<list.size();i++){
+			Dto t = (Dto) list.get(i);
+			t.put("uniquenumpro", sites.get(t.get("uniquenumpro")));
+			
+			t.put("uniquenum", sites.get(t.get("uniquenum")));
+			
+			
+//			if(t.get("timeinterval")==null||t.get("timeinterval").equals("null")){
+//				int times= (int) (Math.random() * 10);
+//				t.put("timeinterval", timesection.get(times+"T"));
+//			}
+//			else
+//			
+//			t.put("timeinterval", timesection.get(t.get("timeinterval")+"T"));
+			
+		}
+		String jsonString = JsonHelper.encodeObject2Json(list,  G4Constants.FORMAT_Date);
+		super.write(jsonString, response);
+		return mapping.findForward(null);
+	}
+	
+	
+	/**
+	 * 班次间隔查询
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward querybancijiange(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		
+		CommonActionForm aForm = (CommonActionForm) form;
+		Dto dto = aForm.getParamAsDto(request);
+		String[] ee = new String[2];
+		
+		String selectroutetime = dto.getAsString("selectroutetime");
+		String updown_name = dto.getAsString("updown_name").equals("Down")?"1":"3";
+		dto.put("updown_name", updown_name);
+		
+		ee=selectroutetime.split("-");
+		
+		String datetime= dto.getAsString("datetime");
+		String datetime1=datetime+" "+ee[0] ;
+		String datetime2= datetime+" "+ee[1] ;
+		
+		
+		
+		dto.put("datetime1", datetime1);
+		dto.put("datetime2", datetime2);
+		Integer countInteger = (Integer) g4Reader.queryForObject("Bus.countgetbancijiange", dto);
+		List list =g4Reader.queryForPage("Bus.getbancijiange", dto);
+		
+		
+		String jsonString = JsonHelper.encodeList2PageJson(list, countInteger, G4Constants.FORMAT_Date);
+		super.write(jsonString, response);
 		return mapping.findForward(null);
 	}
 }

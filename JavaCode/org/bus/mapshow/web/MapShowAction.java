@@ -43,6 +43,20 @@ public class MapShowAction extends BizAction {
 		return mapping.findForward("showMapInitView");
 	}
 	/**
+	 * 站点停靠时间热力图
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward showDockTimeInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		
+		return mapping.findForward("showDockTimeInitView");
+	}
+	/**
 	 * 站点查询
 	 * 
 	 * @param mapping
@@ -79,12 +93,32 @@ public class MapShowAction extends BizAction {
 		response.setContentType("text/html;charset=UTF-8");
 		String route_id=request.getParameter("route_id");
 		String sxx=request.getParameter("sxx");
+		sxx = java.net.URLDecoder.decode(sxx,"UTF-8");
 		System.out.println(sxx);
 		CommonActionForm aForm = (CommonActionForm) form;
 		Dto dto = aForm.getParamAsDto(request);
 		dto.put("route_id", route_id);
 		dto.put("sxx", sxx);
 		List areaList = g4Reader.queryForList("Bus.queryRouteMap", dto);
+		String jsonString = JsonHelper.encodeObject2Json(areaList);
+		write(jsonString, response);
+		return mapping.findForward(null);
+	}
+	/**
+	 * 查出所有线路
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward queryAllRouteMap(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		response.setContentType("text/html;charset=UTF-8");
+		CommonActionForm aForm = (CommonActionForm) form;
+		Dto dto = aForm.getParamAsDto(request);
+		List areaList = g4Reader.queryForList("Bus.queryAllRouteMap", dto);
 		String jsonString = JsonHelper.encodeObject2Json(areaList);
 		write(jsonString, response);
 		return mapping.findForward(null);
@@ -104,6 +138,7 @@ public class MapShowAction extends BizAction {
 		String route_id=request.getParameter("route_id");
 		String sxx=request.getParameter("sxx");
 		System.out.println(sxx);
+		sxx = java.net.URLDecoder.decode(sxx,"UTF-8");
 		CommonActionForm aForm = (CommonActionForm) form;
 		Dto dto = aForm.getParamAsDto(request);
 		dto.put("route_id", route_id);
@@ -129,6 +164,7 @@ public class MapShowAction extends BizAction {
 		String lng=request.getParameter("lng");
 		String lat=request.getParameter("lat");
 		String sxx=request.getParameter("sxx");
+		sxx = java.net.URLDecoder.decode(sxx,"UTF-8");
 		CommonActionForm aForm = (CommonActionForm) form;
 		Dto dto = aForm.getParamAsDto(request);
 		dto.put("route_id", route_id);
@@ -157,6 +193,24 @@ public class MapShowAction extends BizAction {
 		Dto dto = aForm.getParamAsDto(request);
 		dto.put("station_name", station_name);
 		List areaList = g4Reader.queryForList("Bus.queryStationMap", dto);
+		String jsonString = JsonHelper.encodeObject2Json(areaList);
+		write(jsonString, response);
+		return mapping.findForward(null);
+	}
+	public ActionForward queryLaKuangStation(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		response.setContentType("text/html;charset=UTF-8");
+		String swlng=request.getParameter("swlng");
+		String swlat=request.getParameter("swlat");
+		String nelng=request.getParameter("nelng");
+		String nelat=request.getParameter("nelat");
+		CommonActionForm aForm = (CommonActionForm) form;
+		Dto dto = aForm.getParamAsDto(request);
+		dto.put("swlng", swlng);
+		dto.put("swlat", swlat);
+		dto.put("nelng", nelng);
+		dto.put("nelat", nelat);
+		List areaList = g4Reader.queryForList("Bus.queryLaKuangStation", dto);
 		String jsonString = JsonHelper.encodeObject2Json(areaList);
 		write(jsonString, response);
 		return mapping.findForward(null);
@@ -241,6 +295,46 @@ public class MapShowAction extends BizAction {
 			write(jsonString2, response);
 		}
 		
+		return mapping.findForward(null);
+	}
+	/**
+	 * 查询停靠时间
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward queryDockTime(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		response.setContentType("text/html;charset=UTF-8");
+		String route_id=request.getParameter("route_id");
+		String time=request.getParameter("time");
+		String day=request.getParameter("day");
+		String sxx=request.getParameter("sxx");
+		sxx = java.net.URLDecoder.decode(sxx,"UTF-8");
+		String starttime = day+" ";
+		String endtime = day+" ";;
+		if("6:00-8:00".equals(time)){
+			starttime += "6:00:00";
+			endtime += "8:00:00";
+		}else if("9:00-15:00".equals(time)){
+			starttime += "9:00:00";
+			endtime += "15:00:00";
+		}else{
+			starttime += "16:00:00";
+			endtime += "18:00:00";
+		}
+		CommonActionForm aForm = (CommonActionForm) form;
+		Dto dto = aForm.getParamAsDto(request);
+		dto.put("route_id", route_id);
+		dto.put("sxx", sxx);
+		dto.put("starttime", starttime);
+		dto.put("endtime", endtime);
+		List areaList = g4Reader.queryForList("Bus.queryDockTime", dto);
+		String jsonString = JsonHelper.encodeObject2Json(areaList);
+		write(jsonString, response);
 		return mapping.findForward(null);
 	}
 	

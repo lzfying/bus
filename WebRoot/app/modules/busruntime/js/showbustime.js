@@ -5,7 +5,7 @@
  * @since 2014-4-15
  */
 Ext.onReady(function() {
-	
+	Ext.Ajax.timeout = 180000; 
 	
 	var updownstore = new Ext.data.SimpleStore({
 		fields : ['name', 'code'],

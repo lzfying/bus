@@ -5,7 +5,7 @@
  * @since 2014-4-15
  */
 Ext.onReady(function() {
-	
+	Ext.Ajax.timeout = 180000; 
 	
 	var companyStore = new Ext.data.Store({
 		proxy : new Ext.data.HttpProxy({
@@ -518,15 +518,21 @@ var routeCombo = new Ext.form.ComboBox({
 		            },                                                                                   
 		            xAxis: {                                                                             
 		            	//type: 'datetime',
-		            	//tickPixelInterval: 0.5,
-		            	startOnTick: true,                                                               
-		                endOnTick: true,  
+		            	//tickPixelInterval: 10,
+		            	 
 		                title: {                                                                         
 		                    text: '时间区间'                                                          
 		                } ,
-		                labels: {
-		                	
-		                }                                                           
+		                
+		                labels : {  
+
+		                    formatter : function() {//设置纵坐标值的样式  
+
+		                     return this.value ;  
+
+		                    }  
+
+		                   }                                                       
 		            },                                                                                   
 		            yAxis: {                                                                             
 		                title: {                                                                         
@@ -538,7 +544,7 @@ var routeCombo = new Ext.form.ComboBox({
 		                align: 'left',                                                                   
 		                verticalAlign: 'top',                                                            
 		                x: 100,                                                                          
-		                y: 70,                                                                           
+		                y: 80,                                                                           
 		                floating: true,                                                                  
 		                backgroundColor: '#FFFFFF',                                                      
 		                borderWidth: 1                                                                   

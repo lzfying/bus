@@ -192,7 +192,7 @@ var routeCombo = new Ext.form.ComboBox({
 					},  {
 						header : '时段',
 						width : 200,
-						dataIndex : 'time'
+						dataIndex : 'timesection'
 					},{
 						header : '车载机编号',
 						width : 150,
@@ -206,20 +206,17 @@ var routeCombo = new Ext.form.ComboBox({
 					}, {
 						header : '停靠时间',
 						width : 150,
-						dataIndex : 'stoptime'
+						dataIndex : 'stime'
 					},{
 						header : '停靠时间标准值',
 						width : 150,
-						dataIndex : 'standardstoptime',
-						renderer:function(value){
-							//alert(Object.prototype.toString.apply(value));
-							return value.toFixed(2)+'%';
-						}
+						dataIndex : 'avstime'
 
 					},{
 						header : '差值比例',
 						width : 150,
 						dataIndex : 'overrate',
+						hidden : true,
 						renderer:function(value){
 							//alert(Object.prototype.toString.apply(value));
 							return value.toFixed(2)+'%';

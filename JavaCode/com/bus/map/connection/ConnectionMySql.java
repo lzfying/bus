@@ -286,6 +286,14 @@ public class ConnectionMySql {
 		return list_sta;
 	}
 	
+	/**
+	 * 客流量查询
+	 * @param lng
+	 * @param lat
+	 * @param lng1
+	 * @param lat1
+	 * @return
+	 */
 	public List<LoadStatistics> getPassenger_List(String lng,String lat,String lng1,String lat1){
 		List<LoadStatistics> list_sta=new ArrayList<LoadStatistics>();
 		Connection con = new CreateConnection().getConnection();
@@ -308,6 +316,41 @@ public class ConnectionMySql {
 				sta.setP_down(result.getString("p_down"));
 				sta.setP_up(result.getString("p_up"));
 				sta.setP_duan(result.getString("p_duan"));
+				list_sta.add(sta);
+			}
+			sql.close();
+			con.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return list_sta;
+	}
+	
+	/**
+	 * 查询所有站点坐标，以热力图的形式展示在地图中
+	 * @return
+	 */
+	public List<LoadStatistics> getPassenger_List(String routeId){
+		List<LoadStatistics> list_sta=new ArrayList<LoadStatistics>();
+		Connection con = new CreateConnection().getConnection();
+		Statement sql;
+		try {
+			sql = con.createStatement();
+			String sqlstr="SELECT   t.baidu_lng,  t.baidu_lat,  t1.p_down  FROM "+
+						"  route_station_view t "+
+						"  LEFT JOIN sheet1 t1 "+
+						"    ON t.route_id = t1.route_id "+
+						"    AND t.station_id = t1.station_id "+
+						" where t.route_id='"+routeId+"' "+
+						"    ORDER BY t.route_id,"+
+						"  t.station_id ";
+			System.out.println(sqlstr);
+			ResultSet result =sql.executeQuery(sqlstr);
+			while(result.next()){
+				LoadStatistics sta=new LoadStatistics();
+				sta.setLongiTude(result.getString("baidu_lng"));
+				sta.setLatiTude(result.getString("baidu_lat"));
+				sta.setP_down(result.getString("p_down"));
 				list_sta.add(sta);
 			}
 			sql.close();

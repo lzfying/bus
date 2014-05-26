@@ -44,8 +44,8 @@ body {
 
 #apDiv2 {
 	position: absolute;
-	width: 100px;
-	height: 60px;
+	width: 300px;
+	height: 140px;
 	z-index: 2;
 	right: 5px;
 	bottom: 295px;
@@ -53,8 +53,8 @@ body {
 
 #apDiv3 {
 	position: absolute;
-	width: 100px;
-	height: 60px;
+	width: 300px;
+	height: 140px;
 	z-index: 2;
 	right: 5px;
 	bottom: 150px;
@@ -62,8 +62,8 @@ body {
 
 #apDiv4 {
 	position: absolute;
-	width: 100px;
-	height: 60px;
+	width: 300px;
+	height: 140px;
 	z-index: 2;
 	right: 5px;
 	bottom: 5px;

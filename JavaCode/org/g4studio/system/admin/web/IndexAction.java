@@ -1,5 +1,7 @@
 package org.g4studio.system.admin.web;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -52,6 +54,70 @@ public class IndexAction extends BizAction {
     			viewString = "indexView";
     		}
 		}
+        
+        List list = g4Reader.queryForList("Bus.querySiteName");
+		Dto sites = new BaseDto();
+		for(int i=0;i<list.size();i++){
+			Dto t = (Dto) list.get(i);
+			sites.put(t.getAsString("id"), t.getAsString("name"));
+			
+		}
+		getServlet().getServletContext().setAttribute("siteNameList", sites);
+		
+		Dto timesection = new BaseDto();
+//		for(int i=4;i<40;i++){
+//			if(i%2==0){
+//				timesection.put((i-3), i+":30-"+(i+1)+":00");
+//			}
+//			else{
+//				
+//				timesection.put((i-3), i+":00-"+(i)+":30");
+//			}
+//			
+//			
+//		}
+//		
+		timesection.put("3T", "4:30-5:00");
+		timesection.put("4T", "5:00-5:30");
+		timesection.put("5T", "5:30-6:00");
+		timesection.put("6T", "6:00-6:30");
+		timesection.put("7T", "6:30-7:00");
+		timesection.put("8T", "7:00-7:30");
+		timesection.put("9T", "7:30-8:00");
+		timesection.put("10T", "8:00-8:30");
+		timesection.put("11T", "8:30-9:00");
+		timesection.put("12T", "9:00-9:30");
+		timesection.put("13T", "9:30-10:00");
+		timesection.put("14T", "10:00-10:30");
+		timesection.put("15T", "10:30-11:00");
+		timesection.put("16T", "11:00-11:30");
+		timesection.put("17T", "11:30-12:00");
+		timesection.put("18T", "12:00-12:30");
+		timesection.put("19T", "12:30-13:00");
+		timesection.put("20T", "13:00-13:30");
+		timesection.put("21T", "13:30-14:00");
+		timesection.put("22T", "14:00-14:30");
+		timesection.put("23T", "14:30-15:00");
+		timesection.put("24T", "15:00-15:30");
+		timesection.put("25T", "16:30-17:00");
+		timesection.put("26T", "17:00-17:30");
+		timesection.put("27T", "17:30-18:00");
+		timesection.put("28T", "18:00-18:30");
+		timesection.put("29T", "18:30-19:00");
+		timesection.put("30T", "19:00-19:30");
+		timesection.put("31T", "19:30-20:00");
+		timesection.put("32T", "20:00-20:30");
+		timesection.put("33T", "20:30-21:00");
+		timesection.put("34T", "21:00-21:30");
+		timesection.put("35T", "21:30-22:00");
+		timesection.put("36T", "22:00-22:30");
+		timesection.put("37T", "22:30-23:00");
+		timesection.put("38T", "23:00-23:30");
+		timesection.put("39T", "23:30-00:00");
+		timesection.put("40T", "00:00-00:30");
+		timesection.put("41T", "00:30-01:00");
+		timesection.put("42T", "01:00-01:30");
+		getServlet().getServletContext().setAttribute("timesection", timesection);
 		return mapping.findForward(viewString);
 	}
 

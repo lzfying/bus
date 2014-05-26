@@ -176,6 +176,13 @@
     <servlet-name>SelectPassergerServlet</servlet-name>
     <servlet-class>com.bus.map.servlet.SelectPassergerServlet</servlet-class>
   </servlet>
+  <servlet>
+    <description>This is the description of my J2EE component</description>
+    <display-name>This is the display name of my J2EE component</display-name>
+    <servlet-name>HotPointServlet</servlet-name>
+    <servlet-class>com.bus.map.servlet.HotPointServlet</servlet-class>
+  </servlet>
+
 
 
 
@@ -200,6 +207,10 @@
   <servlet-mapping>
     <servlet-name>SelectPassergerServlet</servlet-name>
     <url-pattern>/servlet/SelectPassergerServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>HotPointServlet</servlet-name>
+    <url-pattern>/servlet/HotPointServlet</url-pattern>
   </servlet-mapping>
 	 
 	

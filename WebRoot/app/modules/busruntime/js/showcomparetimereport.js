@@ -1,6 +1,7 @@
 
 
 Ext.onReady(function(){ 
+	Ext.Ajax.timeout = 180000; 
 	var chart;
 	function createReport()
     {
@@ -69,7 +70,7 @@ Ext.onReady(function(){
                     },                                                                           
                     tooltip: {                                                                   
                         headerFormat: '<b>{series.name}</b><br>',                                
-                        pointFormat: '{point.x}  , {point.y} 分钟'                                
+                        pointFormat: ' {point.y} 分钟'                                
                     }                                                                            
                 }                                                                                
             },                                                                                   

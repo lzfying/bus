@@ -6,7 +6,7 @@
  */
 Ext.onReady(function() {
 	
-	
+	Ext.Ajax.timeout = 180000;  
 	var updownstore = new Ext.data.SimpleStore({
 		fields : ['name', 'code'],
 		data : [['下行', 'Down'], ['上行', 'Up']]
@@ -205,7 +205,7 @@ var routeCombo = new Ext.form.ComboBox({
 						sortable : true,
 						width : 200
 					}, {
-						header : '使用次数',
+						header : '使用车辆数',
 						dataIndex : 'usenum',
 						width : 130
 					}]);
