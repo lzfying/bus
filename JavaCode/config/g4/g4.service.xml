@@ -99,4 +99,12 @@
 		</property>
 	</bean>
 	
+	<bean id="busDataService" parent="baseTransactionProxyG4">
+		<property name="target">
+			<bean class="org.bus.datainput.service.impl.BusDataServiceImpl">
+				<property name="g4Dao" ref="g4Dao" />
+			</bean>
+		</property>
+	</bean>
+	
 </beans>

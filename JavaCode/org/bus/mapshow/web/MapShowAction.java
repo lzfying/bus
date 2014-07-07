@@ -72,6 +72,20 @@ public class MapShowAction extends BizAction {
 		return mapping.findForward("showMapStationInitView");
 	}
 	/**
+	 * 道路查询
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward showMapRoadInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		
+		return mapping.findForward("showMapRoadInitView");
+	}
+	/**
 	 * 显示全网速度
 	 * @param mapping
 	 * @param form
@@ -84,6 +98,20 @@ public class MapShowAction extends BizAction {
 			HttpServletResponse response) throws Exception {
 		
 		return mapping.findForward("showSpeedMapInitView");
+	}
+	/**
+	 * 全网查询
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward showMapNetInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		
+		return mapping.findForward("showMapNetInitView");
 	}
 	/**
 	 * 线路查询
@@ -141,7 +169,7 @@ public class MapShowAction extends BizAction {
 		sxx = java.net.URLDecoder.decode(sxx,"UTF-8");
 		CommonActionForm aForm = (CommonActionForm) form;
 		Dto dto = aForm.getParamAsDto(request);
-		dto.put("route_id", route_id);
+		dto.put("route_id", route_id.toUpperCase());
 		dto.put("sxx", sxx);
 		List areaList = g4Reader.queryForList("Bus.queryRouteStation", dto);
 		String jsonString = JsonHelper.encodeObject2Json(areaList);
@@ -160,18 +188,19 @@ public class MapShowAction extends BizAction {
 	public ActionForward queryRouteImg(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
 		response.setContentType("text/html;charset=UTF-8");
-		String route_id=request.getParameter("route_id");
-		String lng=request.getParameter("lng");
-		String lat=request.getParameter("lat");
-		String sxx=request.getParameter("sxx");
-		sxx = java.net.URLDecoder.decode(sxx,"UTF-8");
 		CommonActionForm aForm = (CommonActionForm) form;
 		Dto dto = aForm.getParamAsDto(request);
-		dto.put("route_id", route_id);
-		dto.put("sxx", sxx);
-		dto.put("lng", lng);
-		dto.put("lat", lat);
-		List areaList = g4Reader.queryForList("Bus.queryRouteImg", dto);
+		dto.put("lat", Double.parseDouble(dto.getAsString("lat")));
+		dto.put("lng", Double.parseDouble(dto.getAsString("lng")));
+		List areaList = null;
+		switch(Integer.parseInt(dto.getAsString("mode1"))){
+			case 0:
+				areaList = g4Reader.queryForList("Bus.queryRouteImg", dto);
+			break;
+			default:
+				areaList = g4Reader.queryForList("Bus.queryRouteImg2", dto);
+			break;
+		}
 		String jsonString = JsonHelper.encodeObject2Json(areaList);
 		write(jsonString, response);
 		return mapping.findForward(null);
@@ -337,5 +366,320 @@ public class MapShowAction extends BizAction {
 		write(jsonString, response);
 		return mapping.findForward(null);
 	}
+	/**
+	 * 根据输入模糊搜索线路的名称
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward queryRoadByName(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		response.setContentType("text/html;charset=UTF-8");
+		CommonActionForm aForm = (CommonActionForm) form;
+		Dto dto = aForm.getParamAsDto(request);
+		List areaList = g4Reader.queryForList("MapShow.queryRoadByName", dto);
+		String jsonString = JsonHelper.encodeObject2Json(areaList);
+		write(jsonString, response);
+		return mapping.findForward(null);
+	}
+	/**
+	 * 加载所有道路走廊的信息
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward queryRoadByCorridor(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		response.setContentType("text/html;charset=UTF-8");
+		CommonActionForm aForm = (CommonActionForm) form;
+		Dto dto = aForm.getParamAsDto(request);
+		List areaList = g4Reader.queryForList("MapShow.queryRoadByCorridor", dto);
+		String jsonString = JsonHelper.encodeObject2Json(areaList);
+		write(jsonString, response);
+		return mapping.findForward(null);
+	}
+	/**
+	 * 查找具体线路信息
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward queryRoadDetailInfo(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		response.setContentType("text/html;charset=UTF-8");
+		CommonActionForm aForm = (CommonActionForm) form;
+		Dto dto = aForm.getParamAsDto(request);
+		List areaList = null;
+		if("1".equals(dto.getAsString("nameorcorridor"))){
+			areaList = g4Reader.queryForList("MapShow.queryRoadDetailByName", dto);
+		}else{
+			areaList = g4Reader.queryForList("MapShow.queryRoadDetailByCorridor", dto);
+		}
+		String jsonString = JsonHelper.encodeObject2Json(areaList);
+		write(jsonString, response);
+		return mapping.findForward(null);
+	}
+	/**
+	 * 根据在线路上点击下载图片及其详细信息
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward queryRoadInfoImg(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		response.setContentType("text/html;charset=UTF-8");
+		CommonActionForm aForm = (CommonActionForm) form;
+		Dto dto = aForm.getParamAsDto(request);
+		dto.put("lng", Double.parseDouble(dto.getAsString("lng")));
+		dto.put("lat", Double.parseDouble(dto.getAsString("lat")));
+		List areaList = g4Reader.queryForList("MapShow.queryRoadInfoImg", dto);
+		String jsonString = JsonHelper.encodeObject2Json(areaList);
+		write(jsonString, response);
+		return mapping.findForward(null);
+	}
+	/**
+	 * 站点网络查询
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward queryStationNet(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		response.setContentType("text/html;charset=UTF-8");
+		CommonActionForm aForm = (CommonActionForm) form;
+		Dto dto = aForm.getParamAsDto(request);
+		int selectvalue = Integer.parseInt(dto.getAsString("selectvalue"));
+		List areaList = null;
+		/*<option value="2">港湾式</option>
+		<option value="1">非港湾式</option>
+		<option value="3">中央岛式</option>
+		<option value="0">全部</option>*/
+		switch(selectvalue){
+		case 0:
+			areaList = g4Reader.queryForList("MapShow.queryStationNet_0", dto);
+			break;
+		case 1:
+			areaList = g4Reader.queryForList("MapShow.queryStationNet_1", dto);
+			break;
+		case 2:
+			areaList = g4Reader.queryForList("MapShow.queryStationNet_2", dto);
+			break;
+		case 3:
+			areaList = g4Reader.queryForList("MapShow.queryStationNet_3", dto);
+			break;
+		}
+		
+		String jsonString = JsonHelper.encodeObject2Json(areaList);
+		write(jsonString, response);
+		return mapping.findForward(null);
+	}
+	/**
+	 * 查询站点线路
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward queryStationRouteNet(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		response.setContentType("text/html;charset=UTF-8");
+		CommonActionForm aForm = (CommonActionForm) form;
+		Dto dto = aForm.getParamAsDto(request);
+		int selectvalue = Integer.parseInt(dto.getAsString("selectvalue"));
+		List areaList = null;
+		/*<option value="4">>8</option>
+		<option value="3">>6且<=8</option>
+		<option value="2">>4且<=6</option>
+		<option value="1">>2且<=4</option>
+		<option value="0"><=2</option>*/
+		System.out.println(selectvalue);
+		switch(selectvalue){
+		case 0:
+			dto.put("sc", "");
+			dto.put("bc", 2);
+			areaList = g4Reader.queryForList("MapShow.queryStationRouteNet", dto);
+			break;
+		case 1:
+			dto.put("sc", 2);
+			dto.put("bc", 4);
+			areaList = g4Reader.queryForList("MapShow.queryStationRouteNet", dto);
+			break;
+		case 2:
+			dto.put("sc", 4);
+			dto.put("bc", 6);
+			areaList = g4Reader.queryForList("MapShow.queryStationRouteNet", dto);
+			break;
+		case 3:
+			dto.put("sc", 6);
+			dto.put("bc", 8);
+			areaList = g4Reader.queryForList("MapShow.queryStationRouteNet", dto);
+			break;
+		case 4:
+			dto.put("sc", 8);
+			dto.put("bc", "");
+			areaList = g4Reader.queryForList("MapShow.queryStationRouteNet", dto);
+			break;
+		}
+		
+		String jsonString = JsonHelper.encodeObject2Json(areaList);
+		write(jsonString, response);
+		return mapping.findForward(null);
+	}
+	/**
+	 * 重复系数网络查询
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward queryRepeatNet(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		response.setContentType("text/html;charset=UTF-8");
+		CommonActionForm aForm = (CommonActionForm) form;
+		Dto dto = aForm.getParamAsDto(request);
+		int selectvalue = Integer.parseInt(dto.getAsString("selectvalue"));
+		List areaList = null;
+		/*<option value="1">单向(NE)</option>
+		<option value="2">单向(SW)</option>
+		<option value="3">双向</option>
+		<option value="4">17条以上</option>
+		<option value="5">13-17条</option>
+		<option value="6">8-12条</option>
+		<option value="7">4-7条</option>
+		<option value="8">1-3条</option>*/
+		System.out.println(selectvalue);
+		switch(selectvalue){
+		case 1:
+			dto.put("pos1", "N");
+			dto.put("pos2", "E");
+			areaList = g4Reader.queryForList("MapShow.queryRepeatNetByPos", dto);
+			break;
+		case 2:
+			dto.put("pos1", "W");
+			dto.put("pos2", "S");
+			areaList = g4Reader.queryForList("MapShow.queryRepeatNetByPos", dto);
+			break;
+		case 3:
+			dto.put("pos1", "");
+			dto.put("pos2", "");
+			areaList = g4Reader.queryForList("MapShow.queryRepeatNetByPos", dto);
+			break;
+		case 4:
+			dto.put("sc", 18);
+			dto.put("bc", "");
+			areaList = g4Reader.queryForList("MapShow.queryRepeatNetByRouteCount", dto);
+			break;
+		case 5:
+			dto.put("sc", 13);
+			dto.put("bc", 17);
+			areaList = g4Reader.queryForList("MapShow.queryRepeatNetByRouteCount", dto);
+			break;
+		case 6:
+			dto.put("sc", 8);
+			dto.put("bc", 12);
+			areaList = g4Reader.queryForList("MapShow.queryRepeatNetByRouteCount", dto);
+			break;
+		case 7:
+			dto.put("sc", 4);
+			dto.put("bc", 7);
+			areaList = g4Reader.queryForList("MapShow.queryRepeatNetByRouteCount", dto);
+			break;
+		case 8:
+			dto.put("sc", 1);
+			dto.put("bc", 3);
+			areaList = g4Reader.queryForList("MapShow.queryRepeatNetByRouteCount", dto);
+			break;
+		}
+		
+		String jsonString = JsonHelper.encodeObject2Json(areaList);
+		write(jsonString, response);
+		return mapping.findForward(null);
+	}
+	/**
+	 * 查询公交网络
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward queryBusNet(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		response.setContentType("text/html;charset=UTF-8");
+		CommonActionForm aForm = (CommonActionForm) form;
+		Dto dto = aForm.getParamAsDto(request);
+		int selectvalue = Integer.parseInt(dto.getAsString("selectvalue"));
+		List areaList = null;
+		/*<option value="7">七公司</option>
+		 <option value="8">BRT网络</option>*/
+		System.out.println(selectvalue);
+		switch(selectvalue){
+		case 1:
+			dto.put("ssgs", "一公司");
+			areaList = g4Reader.queryForList("MapShow.queryBusNetByCompany", dto);
+			break;
+		case 2:
+			dto.put("ssgs", "二公司");
+			areaList = g4Reader.queryForList("MapShow.queryBusNetByCompany", dto);
+			break;
+		case 3:
+			dto.put("ssgs", "三公司");
+			areaList = g4Reader.queryForList("MapShow.queryBusNetByCompany", dto);
+			break;
+		case 4:
+			dto.put("ssgs", "四公司");
+			areaList = g4Reader.queryForList("MapShow.queryBusNetByCompany", dto);
+			break;
+		case 5:
+			dto.put("ssgs", "五公司");
+			areaList = g4Reader.queryForList("MapShow.queryBusNetByCompany", dto);
+			break;
+		case 6:
+			dto.put("ssgs", "六公司");
+			areaList = g4Reader.queryForList("MapShow.queryBusNetByCompany", dto);
+			break;
+		case 7:
+			dto.put("ssgs", "七公司");
+			areaList = g4Reader.queryForList("MapShow.queryBusNetByCompany", dto);
+			break;
+		case 8:
+			areaList = g4Reader.queryForList("MapShow.queryBusNetByBRT", dto);
+			break;
+		}
+		
+		String jsonString = JsonHelper.encodeObject2Json(areaList);
+		write(jsonString, response);
+		return mapping.findForward(null);
+	}
 	
+	public ActionForward querySpecialNet(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		response.setContentType("text/html;charset=UTF-8");
+		CommonActionForm aForm = (CommonActionForm) form;
+		Dto dto = aForm.getParamAsDto(request);
+		List areaList = g4Reader.queryForList("MapShow.querySpecialNet", dto);
+		String jsonString = JsonHelper.encodeObject2Json(areaList);
+		write(jsonString, response);
+		return mapping.findForward(null);
+	}
 }

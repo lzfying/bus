@@ -8,6 +8,14 @@ $(document).ready(function(){
   $("#formdiv").hide(500);
   $("#showbutton").show(500);
   });
+  $("#showimgbutton").click(function(){
+  $("#showimgbutton").slideUp(500);
+  $("#hideimgdiv").slideDown(500);
+  });
+  $("#hideimgdiv").click(function(){
+  $("#hideimgdiv").slideUp(500);
+  $("#showimgbutton").slideDown(500);
+  });
   $("#delete").click(function(){
   		map.clearOverlays();
   		colornumhaveuse=0;
@@ -162,6 +170,19 @@ $("#submit").click(function(){
 	showRouteInfo(route_id, sxx,1);
 });
 
+function submitform(){
+	if( mode == 0){
+		map.clearOverlays();
+		colornumhaveuse--;
+	}
+	$("#result").empty();
+	var ima="<div style='text-align:center;font-size:13px;'><img src='resource/image/map/loading.gif' text-align:'center' /><br/>数据加载中，请稍后……</div>";
+	$("#result").append(ima);
+	var route_id = document.getElementById("route_id").value;
+	var sxx = document.getElementById("sxx").value
+	showRouteInfo(route_id, sxx,1);
+	}
+
 //显示站点
 function addStationMaker(objs,sign){
 	var point=new BMap.Point(objs.lng, objs.lat);
@@ -174,8 +195,7 @@ function addStationMaker(objs,sign){
  	}
 	var string = "终:";
 	if( sign == 0){
-		string = "始:"
-		map.panTo(point);
+		string = "始:";
 	}
 	var label = new BMap.Label(""+string+objs.name, optl);  // 创建文本标注对象
 	label.setStyle({
@@ -201,9 +221,20 @@ function addStationMaker(objs,sign){
 	var marker = new BMap.Marker(point,{icon: icon});  // 创建标注
 	map.addOverlay(marker);
 	marker.addEventListener("click",function(){ 
-    	var content = " <div><div><h4 style='margin:0 0 5px 0; color:#FD7828'>"+objs.name+'</h4></div>'+'<div style="margin:0;line-height:1.5;font-size:13px">' + '站台形式：'+station_type_name+'<br/>站台长度：'+objs.len+'米<br/>距离上站：'+objs.ssd+'米<br/>途经线路：'+objs.sjcc.substring(0,objs.sjcc.length-1)+'' +'</div></div>';
-        var infoWindow = new BMap.InfoWindow(content);  // 创建信息窗口对象
-        map.openInfoWindow(infoWindow,point);
+    	
+		var jc_countstr = objs.sjcc.split(",");
+		var jcstr="";
+		for(var i = 0; i<jc_countstr.length; i++){
+			
+			if(i>0 && jc_countstr[i].trim()!=""){
+				jcstr = jcstr+","+jc_countstr[i];
+				}else if(i == 0){
+					jcstr = jc_countstr[i];
+					}
+			}
+    	var content = " <div><div><h4 style='margin:0 0 5px 0; color:#FD7828'>"+objs.name+'</h4></div>'+'<div style="margin:0;line-height:1.5;font-size:13px">' + '站台形式：'+station_type_name+'<br/>站台长度：'+objs.len+'米<br/>距离上站：'+objs.ssd+'米<br/>途经线路：'+jcstr+'' +'</div></div>';
+      var infoWindow = new BMap.InfoWindow(content);  // 创建信息窗口对象
+      map.openInfoWindow(infoWindow,point);
 		});
 }
 //显示线路
@@ -293,25 +324,46 @@ function showRoute(route_id,sxx,obj,isall){
 		map.removeOverlay(label);
  		});
 	polyline.addEventListener("click",function(e){
-		showImg(e.point,obj[0].route_id,obj[0].sxx);
+		switch (mode) {
+			case 0:
+				showImg(e.point,obj[0].route_id,obj[0].sxx);
+			break;
+			default:
+				showImg2(e.point);
+		}
 		});
-	
 	map.addOverlay(polyline);
-	
+	map.setViewport(polyline.getPath());
 	//线路信息显示完了之后再加载站点信息
 	showStationInfo(route_id,sxx,isall);
 }
 
 //下载图片
-function showImg(point, id, sxx){
+function showImg(point,route_id,sxx){
 	$.getJSON("mapshow.do?reqCode=queryRouteImg",{
-	route_id:id,
-	sxx:sxx,
 	lng:point.lng,
-	lat:point.lat
+	lat:point.lat,
+	sxx:sxx,
+	mode1:"0",
+	route_id:route_id
 	},function(js){
 		var obj =  eval(js);
-        var content = " <div><div><h4 style='margin:0;line-height:1.5;font-size:13px'>"+route+"路         车道数量："+obj[0].lanscount+'</div>'+'<div style="margin:0;line-height:1.5;font-size:13px">' +
+        var content = " <div><div><h4 style='margin:0;line-height:1.5;font-size:13px'>"+obj[0].route_id+"路            车道数量："+obj[0].lanscount+'</div>'+'<div style="margin:0;line-height:1.5;font-size:13px">' +
+                    '<img src="resource/image/login.png" alt="resource/image/login.png" style="float:right;zoom:1;overflow:hidden;width:400px;height:220px;margin-left:3px;"/>' +
+                  '</div></div>';
+        var infoWindow = new BMap.InfoWindow(content);  // 创建信息窗口对象
+		map.openInfoWindow(infoWindow,new BMap.Point(obj[0].lng, obj[0].lat));
+	});
+}
+
+function showImg2(point){
+	$.getJSON("mapshow.do?reqCode=queryRouteImg",{
+	lng:point.lng,
+	lat:point.lat,
+	mode1:"1"
+	},function(js){
+		var obj =  eval(js);
+        var content = " <div><div><h4 style='margin:0;line-height:1.5;font-size:13px'>车道数量："+obj[0].lanscount+'</div>'+'<div style="margin:0;line-height:1.5;font-size:13px">' +
                     '<img src="resource/image/login.png" alt="resource/image/login.png" style="float:right;zoom:1;overflow:hidden;width:400px;height:220px;margin-left:3px;"/>' +
                   '</div></div>';
         var infoWindow = new BMap.InfoWindow(content);  // 创建信息窗口对象

@@ -66,9 +66,22 @@ body, html,#allmap {width: 100%;height: 100%;overflow: hidden;margin:0;}
 		<div id="result">
 		</div>
 	</div>
-	<div id="hidediv" onmouseover=this.style.background='#deeff7' onmouseout=this.style.background='#ffffff'>隐藏弹窗<br/><</div>
+	<div id="hidediv" onmouseover=this.style.background='#f2f3f3' onmouseout=this.style.background='#ffffff'>隐藏弹窗<br/><</div>
   	</div>
-	<div id="showbutton" onmouseover=this.style.background='#deeff7' onmouseout=this.style.background='#ffffff'>显示弹窗<br/>></div>
+	<div id="showbutton" onmouseover=this.style.background='#f2f3f3' onmouseout=this.style.background='#ffffff'>显示弹窗<br/>></div>
+	<div id="hideimgdiv" onmouseover=this.style.background='#f2f3f3' onmouseout=this.style.background='#ffffff'>
+	&nbsp;<img src='resource/image/map/rc_4_7.png' id="modeimg" style="overflow:hidden;width:30px;height:8px;" text-align:'center' />&nbsp;速度<15</br>
+	&nbsp;<img src='resource/image/map/rc_13_17.png' id="modeimg" style="overflow:hidden;width:30px;height:8px;" text-align:'center' />&nbsp;15<=速度<25</br>
+	&nbsp;<img src='resource/image/map/rc_17_.png' id="modeimg" style="overflow:hidden;width:30px;height:8px;" text-align:'center' />&nbsp;25<=速度</br>
+	<center>
+		<div style="position:relative; bottom:-5px;text-align:'center'; font-size:10px;">
+			点击消失
+		</div>
+	</center>
+	</div>
+	<div id="showimgbutton" onmouseover=this.style.background='#f2f3f3' onmouseout=this.style.background='#ffffff'>
+		<img src='resource/image/map/img_s.png' id="modeimg" style="overflow:hidden;width:40px;height:12px;" text-align:'center' />
+	</div>
 </div>
 </body>
 </html>

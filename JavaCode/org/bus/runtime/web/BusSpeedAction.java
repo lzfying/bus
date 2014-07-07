@@ -1,11 +1,10 @@
 package org.bus.runtime.web;
 
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
+
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,6 +43,56 @@ public class BusSpeedAction extends BizAction {
 			HttpServletResponse response) throws Exception {
 		
 		return mapping.findForward("busUseInitInitView");
+	}
+	
+	/**
+	 *  second    车辆使用率统计初始化
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward secondbusUseInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		
+		return mapping.findForward("secondbusUseInitView");
+	}
+	
+	
+	
+	/**
+	 * 班次执行情况初始化
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward bancizhixingInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		
+		return mapping.findForward("bancizhixingInitiew");
+	}
+	
+	/**
+	 * 班次执行情况初始化
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward bancijiangenewInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		
+		return mapping.findForward("bancijiangenewInitview");
 	}
 	
 	/**
@@ -718,4 +767,144 @@ public class BusSpeedAction extends BizAction {
 		super.write(jsonString, response);
 		return mapping.findForward(null);
 	}
+	
+	/**
+	 * 班次执行分页
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward querybancizhixing(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		
+		CommonActionForm aForm = (CommonActionForm) form;
+		Dto dto = aForm.getParamAsDto(request);
+		String updown_name = dto.getAsString("updown_name").equals("Down")?"1":"3";
+		dto.put("updown_name", updown_name);
+		List list =g4Reader.queryForPage("BusNew.querybancizhixing", dto);
+		
+		Integer countInteger = (Integer) g4Reader.queryForObject("BusNew.countbancizhixing", dto);
+		
+		String jsonString = JsonHelper.encodeList2PageJson(list, countInteger, G4Constants.FORMAT_Date);
+		super.write(jsonString, response);
+		return mapping.findForward(null);
+	}
+	
+	
+	/**
+	 * 班次执行分页
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward querybancijiangenew(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		
+		CommonActionForm aForm = (CommonActionForm) form;
+		Dto dto = aForm.getParamAsDto(request);
+		int start = dto.getAsInteger("start");
+		int limit = dto.getAsInteger("limit");
+		String updown_name = dto.getAsString("updown_name").equals("Down")?"1":"3";
+		dto.put("updown_name", updown_name);
+		List list ;
+		
+		if(start>0){
+			start=start-1;
+			limit=limit+1;
+			list=g4Reader.queryForPage("BusNew.querybancizhixingorderBytime", dto);
+			for(int i=1;i<list.size();i++){
+				
+				Dto cur =  (Dto) list.get(i);
+				Dto pre =  (Dto) list.get(i-1);
+				
+				String timecur = cur.getAsString("time");
+				String timepre = pre.getAsString("time");
+				
+				cur.put("cha", compareTime(timepre,timecur));
+				
+				
+			}
+			//list = list.subList(1, list.size());
+			
+			
+			
+		}else {
+			
+			list =g4Reader.queryForPage("BusNew.querybancizhixingorderBytime", dto);
+			for(int i=1;i<list.size();i++){
+				
+				Dto cur =  (Dto) list.get(i);
+				Dto pre =  (Dto) list.get(i-1);
+				
+				String timecur = cur.getAsString("time");
+				String timepre = pre.getAsString("time");
+				
+				cur.put("cha", compareTime(timepre,timecur));
+				
+				
+			}
+		}
+		
+		
+		
+		Integer countInteger = (Integer) g4Reader.queryForObject("BusNew.countbancizhixing", dto);
+		
+		String jsonString = JsonHelper.encodeList2PageJson(list, countInteger, G4Constants.FORMAT_Date);
+		super.write(jsonString, response);
+		return mapping.findForward(null);
+	}
+	
+	
+	public String compareTime(String begintime,String endtime) throws ParseException{
+		 SimpleDateFormat dfs = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+		   java.util.Date begin=dfs.parse("2004-01-02 "+begintime);
+
+		   java.util.Date end = dfs.parse("2004-01-02 "+endtime);
+		   
+		   long l=end.getTime()-begin.getTime();
+
+		   long day=l/(24*60*60*1000);
+
+		   long hour=(l/(60*60*1000)-day*24);
+
+		   long min=((l/(60*1000))-day*24*60-hour*60);
+
+		   long s=(l/1000-day*24*60*60-hour*60*60-min*60);
+
+//		   long between=(end.getTime()-begin.getTime())/1000;//除以1000是为了转换成秒
+//
+//		   long day1=between/(24*3600);
+//
+//		   long hour1=between%(24*3600)/3600;
+//
+//		   long minute1=between%3600/60;
+//
+//		   long second1=between%60/60;
+		   String re="";
+		   if(day>0){
+			   re= re+day+"天";
+		   }
+		   if(hour>0){
+			   re= re+hour+"小时";
+		   }
+		   if(min>0){
+			   re= re+min+"分钟"; 
+		   }
+		   if(s>0){
+			   re= re+s+"秒";
+		   }
+		    
+		
+		return re;
+	}
+	
 }

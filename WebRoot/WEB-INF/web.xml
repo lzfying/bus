@@ -111,6 +111,10 @@
 		<listener-class>org.g4studio.core.web.SessionListener</listener-class>    
 	</listener>
 	 
+	 
+	 <listener>
+    <listener-class>com.bus.time.StartTime</listener-class>
+</listener>
 	<!-- 配置ActionServlet,加载Struts配置文件 -->
 	<servlet>
 		<servlet-name>action</servlet-name>
@@ -183,7 +187,17 @@
     <servlet-class>com.bus.map.servlet.HotPointServlet</servlet-class>
   </servlet>
 
+  <servlet>
+    <description>This is the description of my J2EE component</description>
+    <display-name>This is the display name of my J2EE component</display-name>
+    <servlet-name>ImporteMessage</servlet-name>
+    <servlet-class>com.bus.map.servlet.ImporteMessage</servlet-class>
+  </servlet>
 
+  <servlet-mapping>
+    <servlet-name>ImporteMessage</servlet-name>
+    <url-pattern>/servlet/ImporteMessage</url-pattern>
+  </servlet-mapping>
 
 
 

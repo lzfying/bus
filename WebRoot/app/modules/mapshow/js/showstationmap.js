@@ -62,10 +62,9 @@ $("#submit").click(function(){
 var showoverlabel=[];
 function showStationInfo(js){
 		var obj =  eval(js);
+		var points = [];
 		for(var i=0;i<obj.length;i++){
-			if( i == obj.length/2){
-				map.panTo(new BMap.Point(obj[i].lng,obj[i].lat));
-			}
+			points[i] = new BMap.Point(obj[i].lng,obj[i].lat);
 			var station_type_name = "";
 						switch(obj[i].type){
 							case "1": station_type_name = "直列式"; break;
@@ -84,17 +83,29 @@ function showStationInfo(js){
 				lineHeight : "20px",
 				fontFamily:"微软雅黑"
 	 		});
-			var objstr = obj[i].lng+"|"+obj[i].lat+"|"+obj[i].name+"|"+station_type_name+"|"+obj[i].len+"|"+obj[i].wid+"|"+obj[i].ggw+"|"+obj[i].sjcc.substring(0,obj[i].sjcc.length-1);
+	 		
+			var objstr = obj[i].lng+"|"+obj[i].lat+"|"+obj[i].name+"|"+station_type_name+"|"+obj[i].len+"|"+obj[i].wid+"|"+obj[i].ggw+"|"+obj[i].sjcc;
 			var oneresult = "<div id='oneresult' onclick=showclick('"+objstr+"') onmouseover=showmouseover('"+i+"');this.style.background='#dfffe0' onmouseout=removemouseover('"+i+"');this.style.background='#ffffff'><div id='resulttitle'>"+obj[i].name+"("+obj[i].pos+")&nbsp;&nbsp;&nbsp;"+station_type_name+"</div><div id='resultcontent'>广告位数："+obj[i].ggw+"<br/>途经线路："+obj[i].sjcc.substring(0,obj[i].sjcc.length-1)+"</div><div id='hr2'>&nbsp;<div></div>";
 			$("#result").append(oneresult);
 			addTextMaker(obj[i]);
 		}
+		map.setViewport(points);
  }
 
 function showclick(obj){
 		var objstrs = obj.split("|");
 		var point = new BMap.Point(objstrs[0],objstrs[1]);
-		var content =" <div><div><h4 style='margin:0 0 5px 0; color:#FD7828'>"+objstrs[2]+'</h4></div>'+'<div style="margin:0;line-height:1.5;font-size:13px">' +'站台形式：'+objstrs[3]+'<br/>站台长度：'+objstrs[4]+'米<br/>站台宽度：'+objstrs[5]+'米<br/>广告位数：'+objstrs[6]+'<br/>途经线路：'+objstrs[7]+'' +'</div></div>';
+		var jc_countstr = objstrs[7].split(",");
+		var jcstr="";
+		for(var i = 0; i<jc_countstr.length; i++){
+			
+			if(i>0 && jc_countstr[i].trim()!=""){
+				jcstr = jcstr+","+jc_countstr[i];
+				}else if(i == 0){
+					jcstr = jc_countstr[i];
+					}
+			}
+		var content =" <div><div><h4 style='margin:0 0 5px 0; color:#FD7828'>"+objstrs[2]+'</h4></div>'+'<div style="margin:0;line-height:1.5;font-size:13px">' +'站台形式：'+objstrs[3]+'<br/>站台长度：'+objstrs[4]+'米<br/>站台宽度：'+objstrs[5]+'米<br/>广告位数：'+objstrs[6]+'<br/>途经线路：'+jcstr+'' +'</div></div>';
     var infoWindow = new BMap.InfoWindow(content);  // 创建信息窗口对象
     map.openInfoWindow(infoWindow,point);
 		map.panTo(point);

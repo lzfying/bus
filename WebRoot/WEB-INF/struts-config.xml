@@ -169,6 +169,11 @@
 			<forward name="commonroadblockedInitView" path="/app/modules/abnormal/commonroadblocked.jsp" />
 			
 			<forward name="bancijiangeInitView" path="/app/modules/abnormal/jiange.jsp" />
+			
+			<forward name="secondbusUseInitView" path="/app/modules/busruntime/secondbususeratio.jsp" />
+			<forward name="bancizhixingInitiew" path="/app/modules/abnormal/bancizhixing.jsp" />
+			
+			<forward name="bancijiangenewInitview" path="/app/modules/abnormal/bancijiange.jsp" />
 			</action>	
 			
 		<action name="commonActionForm" path="/mapshow" scope="request"
@@ -180,6 +185,21 @@
 			<forward name="showMapInitView" path="/app/modules/mapshow/showroutemap.jsp" />
 			<forward name="showMapStationInitView" path="/app/modules/mapshow/showstationmap.jsp" />
 			<forward name="showSpeedMapInitView" path="/app/modules/mapshow/showspeedmap.jsp" />
+			<forward name="showDockTimeInitView" path="/app/modules/mapshow/showdocktimemap.jsp" />
+			<!-- 6-9新加的内容 -->
+			<forward name="showMapRoadInitView" path="/app/modules/mapshow/showroadmap.jsp" />
+			<forward name="showMapNetInitView" path="/app/modules/mapshow/shownetmap.jsp" />
+			
+		</action>
+		
+	<action name="commonActionForm" path="/datainput" scope="request"
+			parameter="reqCode"
+			type="org.bus.datainput.web.BusDataInputAction">
+			<forward name="routeshowBymapView" path="/app/MapJiNanv2/index_1.jsp" />
+			<forward name="compareTimeInitView" path="/app/modules/datainput/compareshowbustime.jsp" />
+			<forward name="busDaysPlanInitView" path="/app/modules/datainput/busdaysplan.jsp" />
+			<forward name="busDaysPlan1InitView" path="/app/modules/datainput/busdaysplan1.jsp" />
+			
 		</action>
 	
 	
@@ -191,7 +211,51 @@
 			
 			<forward name="busSiteSpeedMapInitView" path="/app/map/selectPassenger.jsp" />
 			<forward name="buskeliuMapInitView" path="/app/map/statistics.jsp" />
-			</action>	
+			</action>
+			
+			
+			
+	<action name="commonActionForm" path="/datainput" scope="request"
+			parameter="reqCode"
+			type="org.bus.datainput.web.BusDataInputAction">
+			<forward name="routeshowBymapView" path="/app/MapJiNanv2/index_1.jsp" />
+			<forward name="compareTimeInitView" path="/app/modules/datainput/compareshowbustime.jsp" />
+			<forward name="busDaysPlanInitView" path="/app/modules/datainput/busdaysplan.jsp" />
+			
+		</action>
+		
+		
+		
+		<action name="commonActionForm" path="/busbanci" scope="request"
+			parameter="reqCode"
+			type="org.bus.banci.web.BusBanciAction">
+			<forward name="queryCompanyBanciInitView" path="/app/modules/banci/companybanci.jsp" />
+			<forward name="queryTeamBanciInitView" path="/app/modules/banci/teambanci.jsp" />
+			<forward name="queryRouteBanciInitView" path="/app/modules/banci/routebanci.jsp" />
+			<forward name="queryCompanyPeakSectionInitView" path="/app/modules/banci/companypeaksection.jsp" />
+			<forward name="queryTeamPeakSectionInitView" path="/app/modules/banci/teampeaksection.jsp" />
+			<forward name="queryRoutePeakSectionInitView" path="/app/modules/banci/routepeaksection.jsp" />
+			<forward name="queryCompanyFlatPeakIntervalInitView" path="/app/modules/banci/companyflatpeakinterval.jsp" />
+			<forward name="queryTeamFlatPeakIntervalInitView" path="/app/modules/banci/teamflatpeakinterval.jsp" />
+			<forward name="queryRouteFlatPeakIntervalInitView" path="/app/modules/banci/routeflatpeakinterval.jsp" />
+			<forward name="queryCompanyOverInitView" path="/app/modules/banci/companyoverbus.jsp" />
+			<forward name="queryTeamOverInitView" path="/app/modules/banci/teamoverbus.jsp" />
+			<forward name="queryRouteOverInitView" path="/app/modules/banci/routeoverbus.jsp" />
+			<forward name="queryWeekendBanciInitView" path="/app/modules/banci/weekendbanci.jsp" />
+			<forward name="queryBanciExecuteInitView" path="/app/modules/banci/banciexecute.jsp" />
+			<forward name="queryBanciJianGePlanInitView" path="/app/modules/banci/bancijiangeplan.jsp" />
+			
+		</action>
+		
+			<action name="commonActionForm" path="/busout" scope="request"
+			parameter="reqCode"
+			type="org.bus.busout.web.BusOutAction">
+			<forward name="queryCompanyBusOutInitView" path="/app/modules/busout/companybusout.jsp" />
+			<forward name="queryTeamBusOutInitView" path="/app/modules/busout/teambusout.jsp" />
+			<forward name="queryRouteBusOutInitView" path="/app/modules/busout/routebusout.jsp" />
+		</action>
 	</action-mappings>
+	
+	
 
 </struts-config>

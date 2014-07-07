@@ -8,6 +8,14 @@ $(document).ready(function(){
   $("#formdiv").hide(500);
   $("#showbutton").show(500);
   });
+  $("#showimgbutton").click(function(){
+  $("#showimgbutton").slideUp(500);
+  $("#hideimgdiv").slideDown(500);
+  });
+  $("#hideimgdiv").click(function(){
+  $("#hideimgdiv").slideUp(500);
+  $("#showimgbutton").slideDown(500);
+  });
 });
 
 // 百度地图API功能
@@ -37,13 +45,13 @@ $("#submit").click(function(){
 });
 
 function showeveryroutespeed(objs){
-	color = "red";
+	color = "#ff0000";
 	var speed = parseInt(objs.realspeed.toFixed(2));
 	
 	if(15 <= speed &&speed<25 ){
-		color = "yellow";
+		color = "#fc9e0a";
 	}else if( speed >= 25){
-		color = "green";
+		color = "#18fe2e";
 		
 	}
 	

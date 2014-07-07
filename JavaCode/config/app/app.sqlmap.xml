@@ -6,4 +6,8 @@
 	<!-- 请将此配置改为您的业务系统包路径下的SQL映射文件 -->
 	<sqlMap resource="org/g4studio/demo/dao/sqlmap/biz/Temp.xml" />
 	<sqlMap resource="org/bus/runtime/dao/sqlmap/bus.xml" />
+	<sqlMap resource="org/bus/runtime/dao/sqlmap/busnew.xml" />
+	<sqlMap resource="org/bus/datainput/dao/sqlmap/busdatainput.xml" />
+	<sqlMap resource="org/bus/banci/dao/sqlmap/busbanci.xml" />
+	<sqlMap resource="org/bus/mapshow/dao/sqlmap/mapshow.xml" />
 </sqlMapConfig>

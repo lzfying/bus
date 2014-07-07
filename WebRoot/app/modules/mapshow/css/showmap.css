@@ -7,12 +7,12 @@
 }
 
 #formdiv{
-	position:relative;
-	top:10px; 
-	left:5px;
 	height:100%; 
 	width:240px;
 	position:absolute;
+	filter = alpha(opacity=80);
+	-moz-opacity:0.80; /*支持 FireFox 浏览器*/
+	opacity:0.80;  /*支持 Chrome, Opera, Safari 等浏览器*/
 	left:0px; 
 	top:0px; 
 	background:#ffffff;
@@ -25,6 +25,34 @@
 }
 
 #inputdiv2{
+	position:relative; 
+	top:20px; 
+	left:10px;
+}
+
+#div_station{
+	display:none;
+	position:relative; 
+	top:20px; 
+	left:10px;
+}
+
+#div_busnet{
+	display:block;
+	position:relative; 
+	top:20px; 
+	left:10px;
+}
+
+#div_station_route{
+	display:none;
+	position:relative; 
+	top:20px; 
+	left:10px;
+}
+
+#div_repeat{
+	display:none;
 	position:relative; 
 	top:20px; 
 	left:10px;
@@ -44,15 +72,18 @@
 
 #inputname{
 	font-size:13px;
-	font-family:'宋体'; 
+	font-family:'宋体';
+	line-height:25px; 
 	width:80px; 
-	height:20px;
+	height:25px;
 	
 }
 
 #inputfield{
 	 position:absolute; 
-	 left:80px; 
+	 left:80px;
+	 line-height:25px; 
+	 height:25px;  
 	 top:0px;
 }
 
@@ -76,6 +107,9 @@
 	width:20px;
 	padding:10px 5px;
 	color:#999;
+	filter = alpha(opacity=80);
+	-moz-opacity:0.80; /*支持 FireFox 浏览器*/
+	opacity:0.80;  /*支持 Chrome, Opera, Safari 等浏览器*/
 	cursor:pointer;
 	text-align:center; 
 	background:#ffffff; 
@@ -87,6 +121,9 @@
 	position:absolute;
 	left:0px; 
 	top:40%;
+	filter = alpha(opacity=80);
+	-moz-opacity:0.80; /*支持 FireFox 浏览器*/
+	opacity:0.80;  /*支持 Chrome, Opera, Safari 等浏览器*/
 	width:20px;
 	padding:10px 5px;
 	color:#999;
@@ -94,6 +131,52 @@
 	text-align:center; 
 	background:#ffffff; 
 	height:80px;
+}
+#hideimgdiv{
+	position:absolute;
+	left:42%; 
+	top:0px;
+	filter = alpha(opacity=80);
+	-moz-opacity:0.80; /*支持 FireFox 浏览器*/
+	opacity:0.80;  /*支持 Chrome, Opera, Safari 等浏览器*/
+	width:220px;
+	color:#999;
+	cursor:pointer;
+	font-size:12px;
+	text-align:left; 
+	background:#ffffff; 
+	height:60px;
+}
+#hideimgdiv2{
+	display:none;
+	position:absolute;
+	left:42%; 
+	top:0px;
+	filter = alpha(opacity=80);
+	-moz-opacity:0.80; /*支持 FireFox 浏览器*/
+	opacity:0.80;  /*支持 Chrome, Opera, Safari 等浏览器*/
+	width:220px;
+	color:#999;
+	cursor:pointer;
+	font-size:12px;
+	text-align:left; 
+	background:#ffffff; 
+	height:60px;
+}
+#showimgbutton{
+	display:none;
+	filter = alpha(opacity=50);
+	-moz-opacity:0.50; /*支持 FireFox 浏览器*/
+	opacity:0.50;  /*支持 Chrome, Opera, Safari 等浏览器*/
+	position:absolute;
+	left:48%; 
+	top:0px;
+	width:50px;
+	color:#999;
+	cursor:pointer;
+	text-align:center; 
+	background:#ffffff; 
+	height:15px;
 }
 
 #modeselect{
@@ -188,7 +271,7 @@
 	margin:0;
 	line-height:1.2;
 	font-size:13px;
-	font-weight: bold
+	font-weight: bold;
 	word-break:break-all;
 	word-wrap:break-word;	
 }
